@@ -13,6 +13,7 @@
     ./hardware-configuration.nix
     ./nvidia.nix
     ./system-apps.nix
+    ./creative.nix
   ];
 
   # 1. Allow unfree software (required for the proprietary userspace part of the driver)
