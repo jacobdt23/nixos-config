@@ -5,6 +5,20 @@
 { config, pkgs, ... }:
 
 {
+
+
+# Automatic Garbage Collection
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
+
+  # Optimizes the nix store by hardlinking duplicate files
+  nix.settings.auto-optimise-store = true;
+
+
+
   # Enable Flakes and the new 'nix' command
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 

@@ -14,6 +14,10 @@
     curl
     pciutils
     fastfetch
+    protonup-qt  
+    mangohud     
+    nvtopPackages.full
+    goverlay 
   ];
 
   # Enable Steam (system-level)
