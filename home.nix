@@ -36,7 +36,8 @@
       editconf = "nano ~/nixos-config/configuration.nix";
       edithome = "nano ~/nixos-config/home.nix";
       editapps = "nano ~/nixos-config/system-apps.nix";
-      cleanup = "sudo nix-collect-garbage -d";
+      cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
+      listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
       doom = "/home/jacob/.config/emacs/bin/doom";
     };
     };
@@ -44,8 +45,8 @@
   programs.git = {
     enable = true;
     settings.user = {
-      name = "Jacob Turner";
-      email = "your-email@example.com"; 
+      name = "jacobdt23";
+      email = "turnejac01@gmail.com"; 
     };
   };
 
