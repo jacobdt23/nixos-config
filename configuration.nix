@@ -12,6 +12,7 @@
   imports = [ 
     ./hardware-configuration.nix
     ./nvidia.nix
+    ./system-apps.nix
   ];
 
   # 1. Allow unfree software (required for the proprietary userspace part of the driver)
@@ -88,12 +89,6 @@
     isNormalUser = true;
     description = "jacob";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [
-      kdePackages.kate
-      firefox
-      git
-      emacs
-      neovim
     ];
   };
 

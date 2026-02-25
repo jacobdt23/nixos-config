@@ -14,7 +14,8 @@
     fd
     gcc
     unzip
-
+    firefox
+    kdePackages.kate
     # Doom Doctor's missing tools
     shellcheck       # Fixes the :lang sh warning
     pandoc           # Best markdown compiler for :lang markdown
@@ -30,7 +31,7 @@
   programs.bash = {
     enable = true;
     shellAliases = {
-      rebuild = "sudo nixos-rebuild switch --flake /etc/nixos#nixos";
+      rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
       edit = "sudo nano -lc /etc/nixos/configuration.nix";
       edithome = "sudo nano -lc /etc/nixos/home.nix";
       cleanup = "sudo nix-collect-garbage -d";
