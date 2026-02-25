@@ -40,7 +40,8 @@
     efiSupport = true;
     useOSProber = true;
     configurationLimit = 10;
-    
+  
+       
     # Manual entry to chainload PikaOS via rEFInd
     extraEntries = ''
       menuentry "PikaOS (rEFInd)" {
@@ -51,6 +52,9 @@
       }
     '';
   };
+
+  # Move this HERE (outside of the grub brackets)
+  boot.kernel.sysctl = { "vm.max_map_count" = 2147483642; };
 
   networking.hostName = "nixos"; # Define your hostname.
   networking.networkmanager.enable = true;
