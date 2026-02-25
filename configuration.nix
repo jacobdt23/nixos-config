@@ -89,7 +89,6 @@
     isNormalUser = true;
     description = "jacob";
     extraGroups = [ "networkmanager" "wheel" ];
-    ];
   };
 
 # Home Manager Settings

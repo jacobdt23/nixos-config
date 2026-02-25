@@ -30,15 +30,15 @@
 
   programs.bash = {
     enable = true;
-    shellAliases = {
+  shellAliases = {
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
-      edit = "sudo nano -lc /etc/nixos/configuration.nix";
-      edithome = "sudo nano -lc /etc/nixos/home.nix";
+      # Update these to point to your home folder repo:
+      editconf = "nano ~/nixos-config/configuration.nix";
+      edithome = "nano ~/nixos-config/home.nix";
+      editapps = "nano ~/nixos-config/system-apps.nix";
       cleanup = "sudo nix-collect-garbage -d";
       doom = "/home/jacob/.config/emacs/bin/doom";
     };
-  };
-
   # 3. Fix the Git warnings for 25.11
   programs.git = {
     enable = true;
