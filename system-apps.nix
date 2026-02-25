@@ -13,6 +13,7 @@
     wget
     curl
     pciutils
+    fastfetch
   ];
 
   # Enable Steam (system-level)
