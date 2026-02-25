@@ -17,7 +17,8 @@
     protonup-qt  
     mangohud     
     nvtopPackages.full
-    goverlay 
+    goverlay
+    vulkan-tools 
   ];
 
   # Enable Steam (system-level)
