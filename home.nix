@@ -32,7 +32,7 @@
     enable = true;
   shellAliases = {
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
-      # Update these to point to your home folder repo:
+      gsync = "git add . && git commit -m \"Sync: $(date +'%Y-%m-%d %H:%M:%S')\" && git push";      
       editconf = "nano ~/nixos-config/configuration.nix";
       edithome = "nano ~/nixos-config/home.nix";
       editapps = "nano ~/nixos-config/system-apps.nix";
