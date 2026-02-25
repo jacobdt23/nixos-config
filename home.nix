@@ -39,6 +39,7 @@
       cleanup = "sudo nix-collect-garbage -d";
       doom = "/home/jacob/.config/emacs/bin/doom";
     };
+    };
   # 3. Fix the Git warnings for 25.11
   programs.git = {
     enable = true;
