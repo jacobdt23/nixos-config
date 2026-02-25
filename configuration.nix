@@ -18,6 +18,10 @@
   nix.settings.auto-optimise-store = true;
 
 
+  # Add this temporarily for testing
+  services.getty.autologinUser = "jacob";
+
+
 
   # Enable Flakes and the new 'nix' command
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -80,9 +84,18 @@
   # Enable the X11 windowing system.
   services.xserver.enable = true;
 
-  # Enable the KDE Plasma Desktop Environment.
+
+# Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
+
+  # ADD THIS BLOCK HERE:
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "jacob";
+  };
+
+
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -107,6 +120,7 @@
   users.users.jacob = {
     isNormalUser = true;
     description = "jacob";
+    initialPassword = "test"; # Add this line
     extraGroups = [ "networkmanager" "wheel" ];
   };
 
