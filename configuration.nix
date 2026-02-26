@@ -1,52 +1,32 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 {
-
-
-# Automatic Garbage Collection
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 7d";
-  };
-
-  # Optimizes the nix store by hardlinking duplicate files
-  nix.settings.auto-optimise-store = true;
-
-
-  # Add this temporarily for testing
-  services.getty.autologinUser = "jacob";
-
-
-
-  # Enable Flakes and the new 'nix' command
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-
-  imports = [ 
+  imports = [  
     ./hardware-configuration.nix
     ./nvidia.nix
     ./system-apps.nix
     ./creative.nix
   ];
 
-  # 1. Allow unfree software (required for the proprietary userspace part of the driver)
-  nixpkgs.config.allowUnfree = true;
+  # --- Nix System Management ---
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    auto-optimise-store = true; # Keeps that 7.5GB you just freed from coming back
+  };
 
-# Enable GRUB
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
+  };
+
+  # --- Bootloader & Kernel ---
   boot.loader.grub = {
     enable = true;
     device = "nodev";
     efiSupport = true;
     useOSProber = true;
     configurationLimit = 10;
-  
-       
-    # Manual entry to chainload PikaOS via rEFInd
     extraEntries = ''
       menuentry "PikaOS (rEFInd)" {
         insmod part_gpt
@@ -57,57 +37,28 @@
     '';
   };
 
-  # Move this HERE (outside of the grub brackets)
+  # Fix for Hogwarts Legacy map/freezing
   boot.kernel.sysctl = { "vm.max_map_count" = 2147483642; };
 
-  networking.hostName = "nixos"; # Define your hostname.
+  # --- Networking & Localization ---
+  networking.hostName = "nixos";
   networking.networkmanager.enable = true;
-
-  # Set your time zone.
   time.timeZone = "America/Indiana/Indianapolis";
-
-  # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
 
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
-  # Enable the X11 windowing system.
+  # --- Desktop Environment (KDE Plasma 6) ---
   services.xserver.enable = true;
-
-
-# Enable the KDE Plasma Desktop Environment.
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
-
-  # ADD THIS BLOCK HERE:
-  services.displayManager.autoLogin = {
-    enable = true;
-    user = "jacob";
-  };
-
-
-
-  # Configure keymap in X11
+  
+  # Set US Keymap
   services.xserver.xkb = {
     layout = "us";
     variant = "";
   };
 
-  # Enable CUPS to print documents.
+  # --- Hardware & Sound ---
   services.printing.enable = true;
-
-  # Enable sound with pipewire.
-  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -116,15 +67,19 @@
     pulse.enable = true;
   };
 
-# 1. Add the package to your user
+  # --- User Account ---
   users.users.jacob = {
     isNormalUser = true;
     description = "jacob";
-    initialPassword = "test"; # Add this line
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
+    # Note: Using your actual password set during install. 
+    # initialPassword is removed now for host security.
   };
 
-# Home Manager Settings
+  # --- Global App Settings ---
+  nixpkgs.config.allowUnfree = true;
+
+  # Home Manager Integration
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.users.jacob = import ./home.nix;
