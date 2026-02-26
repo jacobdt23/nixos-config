@@ -19,7 +19,8 @@
     mangohud     
     nvtopPackages.full
     goverlay
-    vulkan-tools 
+    vulkan-tools
+    gnome-disk-utility  
   ];
 
   # Enable Steam (system-level)
