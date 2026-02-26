@@ -10,7 +10,6 @@
     git
     github-desktop    
     emacs   
-    vim
     neovim
     wget
     curl
