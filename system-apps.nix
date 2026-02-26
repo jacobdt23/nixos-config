@@ -7,7 +7,8 @@
   environment.systemPackages = with pkgs; [
     kdePackages.kate
     firefox
-    git    
+    git
+    github-desktop    
     emacs   
     neovim
     wget
