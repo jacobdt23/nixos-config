@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  imports = [   
+  imports = [    
     ./hardware-configuration.nix
     ./nvidia.nix
     ./system-apps.nix
@@ -11,7 +11,7 @@
   # --- Nix System Management ---
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store = true; 
+    auto-optimise-store = true;  
   };
 
   nix.gc = {
@@ -52,7 +52,7 @@
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
-  
+    
   # Set US Keymap
   services.xserver.xkb = {
     layout = "us";
@@ -76,6 +76,15 @@
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
   };
 
+  # --- Steam Configuration ---
+  programs.steam = {
+    enable = true;
+    # This allows Steam to see and use the /mnt/GAMES drive
+    extest.enable = true;  
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
+  };
+
   # --- Global App Settings ---
   nixpkgs.config.allowUnfree = true;
 
@@ -84,5 +93,5 @@
   home-manager.useUserPackages = true;
   home-manager.users.jacob = import ./home.nix;
 
-  system.stateVersion = "25.11";  
+  system.stateVersion = "25.11";   
 }
