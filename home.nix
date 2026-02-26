@@ -44,6 +44,7 @@
   # 3. Fix the Git warnings for 25.11
   programs.git = {
     enable = true;
+    lfs.enable = true;
     settings.user = {
       name = "jacobdt23";
       email = "turnejac01@gmail.com"; 
