@@ -149,7 +149,6 @@
 
   programs.bash = {
     enable = true;
-    initExtra = "fastfetch"; # Only run once on terminal start
     shellAliases = {
       # Build & Maintenance
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
