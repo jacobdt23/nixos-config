@@ -1,10 +1,9 @@
 { pkgs, ... }:
 
 {
-  # Allow unfree software for things like Steam or proprietary drivers
   nixpkgs.config.allowUnfree = true;
 
-  # Neovim Wrapper Configuration
+  # Neovim Wrapper: Makes 'vi' and 'vim' call Neovim
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -13,10 +12,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    # Neovim GUI
-    neovide
-    
-    # System Tools
+    neovide           # The hardware-accelerated GUI
     kdePackages.kate
     firefox
     git
@@ -34,7 +30,6 @@
     gnome-disk-utility   
   ];
 
-  # Enable Steam (system-level)
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;

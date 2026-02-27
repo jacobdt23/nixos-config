@@ -8,16 +8,16 @@
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
-    # Dependencies for Neovim/LazyVim
+    # LazyVim/Neovim Dependencies
     lua-language-server
     nil                  # Nix Language Server
     stylua               # Lua Formatter
-    
-    # Existing Tools
     ripgrep
     fd
     gcc
     unzip
+    
+    # Personal Apps
     firefox
     kdePackages.kate
     shellcheck
@@ -25,6 +25,11 @@
     symbola
     nerd-fonts.symbols-only 
   ];
+
+  # This silences the "Could not watch config file" error
+  home.file.".config/neovide/config.toml".text = ''
+    fork = true
+  '';
 
   home.sessionPath = [
     "$HOME/.config/emacs/bin"
@@ -39,11 +44,10 @@
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
       
-      # GUI Editing Aliases (Neovide)
-      editconf = "neovide ~/nixos-config/configuration.nix & disown";
-      edithome = "neovide ~/nixos-config/home.nix & disown";
-      editapps = "neovide ~/nixos-config/system-apps.nix & disown";
-      
+      # Corrected Silent GUI Aliases
+      editconf = "neovide ~/nixos-config/configuration.nix > /dev/null 2>&1 & disown";
+      edithome = "neovide ~/nixos-config/home.nix > /dev/null 2>&1 & disown";
+      editapps = "neovide ~/nixos-config/system-apps.nix > /dev/null 2>&1 & disown";
       doom = "/home/jacob/.config/emacs/bin/doom";
     };
   };
