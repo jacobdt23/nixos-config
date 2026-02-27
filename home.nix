@@ -149,7 +149,8 @@
 
   programs.bash = {
     enable = true;
-    shellAliases = {
+  initExtra = "showcase"; # This will run your combined hardware + tree command
+  shellAliases = {
       # Build & Maintenance
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
       gsync = "git add . && git commit -m \"Sync: $(date +'%Y-%m-%d %H:%M:%S')\" && git push";      
