@@ -1,7 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  imports = [  
+  imports = [    
     ./hardware-configuration.nix
     ./nvidia.nix
     ./system-apps.nix
@@ -11,7 +11,7 @@
   # --- Nix System Management ---
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store = true; # Keeps that 7.5GB you just freed from coming back
+    auto-optimise-store = true;  
   };
 
   nix.gc = {
@@ -20,21 +20,23 @@
     options = "--delete-older-than 7d";
   };
 
-  # --- Bootloader & Kernel ---
+  # --- Bootloader ---
   boot.loader.grub = {
     enable = true;
-    device = "nodev";
+    device = "nodev"; # "nodev" is correct for EFI systems
     efiSupport = true;
-    useOSProber = true;
+    useOSProber = false; # Cleaned up PikaOS entries
     configurationLimit = 10;
-    extraEntries = ''
-      menuentry "PikaOS (rEFInd)" {
-        insmod part_gpt
-        insmod fat
-        search --no-floppy --fs-uuid --set=root 5747-B54B
-        chainloader /EFI/refind/refind_x64.efi
-      }
-    '';
+  };
+
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  # --- Storage ---
+  # This mounts your 2TB Samsung 990 PRO to /mnt/GAMES
+  fileSystems."/mnt/GAMES" = {
+    device = "/dev/disk/by-uuid/c7cd2f66-a823-4cc7-8f24-b64bed83a67c";
+    fsType = "ext4";
+    options = [ "defaults" "nofail" "user" ];
   };
 
   # Fix for Hogwarts Legacy map/freezing
@@ -50,7 +52,7 @@
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
-  
+    
   # Set US Keymap
   services.xserver.xkb = {
     layout = "us";
@@ -72,8 +74,15 @@
     isNormalUser = true;
     description = "jacob";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
-    # Note: Using your actual password set during install. 
-    # initialPassword is removed now for host security.
+  };
+
+  # --- Steam Configuration ---
+  programs.steam = {
+    enable = true;
+    # This allows Steam to see and use the /mnt/GAMES drive
+    extest.enable = true;  
+    remotePlay.openFirewall = true;
+    dedicatedServer.openFirewall = true;
   };
 
   # --- Global App Settings ---
@@ -84,5 +93,5 @@
   home-manager.useUserPackages = true;
   home-manager.users.jacob = import ./home.nix;
 
-  system.stateVersion = "25.11"; 
+  system.stateVersion = "25.11";   
 }

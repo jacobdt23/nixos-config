@@ -5,49 +5,179 @@
   home.homeDirectory = "/home/jacob";
   home.stateVersion = "25.11";
 
-  # 1. This handles the 'Symbola' and 'Nerd Font' warnings
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
-    # Doom Muscles
+    # Neovim & LazyVim Support
+    lua-language-server
+    nil
+    stylua
     ripgrep
     fd
     gcc
     unzip
+
+    # Tech Tools
+    fastfetch
+    pciutils
+    tree # Added for your showcase alias
+
+    # Productivity & Creative
     firefox
     kdePackages.kate
-    # Doom Doctor's missing tools
-    shellcheck       # Fixes the :lang sh warning
-    pandoc           # Best markdown compiler for :lang markdown
-    symbola          # Fallback font Doom requested
-    nerd-fonts.symbols-only # The specific icons Doom needs
+    shellcheck
+    pandoc
+    symbola
+    nerd-fonts.symbols-only  
   ];
 
-  # 2. This keeps the 'doom' binary in your path
-  home.sessionPath = [
-    "$HOME/.config/emacs/bin"
-  ];
+  home.file = {
+    # Silence Neovide noise
+    ".config/neovide/config.toml".text = "fork = true";
+    
+    # Chris Titus Custom Fastfetch Config
+    ".config/fastfetch/config.jsonc".text = ''
+      {
+        "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+        "logo": {
+          "padding": {
+            "top": 1
+          }
+        },
+        "display": {
+          "separator": " 󰑃  "
+        },
+        "modules": [
+          "break",
+          {
+            "type": "os",
+            "key": " DISTRO",
+            "keyColor": "yellow"
+          },
+          {
+            "type": "kernel",
+            "key": "│ ├",
+            "keyColor": "yellow"
+          },
+          {
+            "type": "packages",
+            "key": "│ ├󰏖",
+            "keyColor": "yellow"
+          },
+          {
+            "type": "command",
+            "key": "│ ├",
+            "keyColor": "yellow",
+            "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
+          },
+          {
+            "type": "shell",
+            "key": "│ └",
+            "keyColor": "yellow"
+          },
+          {
+            "type": "wm",
+            "key": " DE/WM",
+            "keyColor": "blue"
+          },
+          {
+            "type": "wmtheme",
+            "key": "│ ├󰉼",
+            "keyColor": "blue"
+          },
+          {
+            "type": "icons",
+            "key": "│ ├󰀻",
+            "keyColor": "blue"
+          },
+          {
+            "type": "cursor",
+            "key": "│ ├",
+            "keyColor": "blue"
+          },
+          {
+            "type": "terminal",
+            "key": "│ └",
+            "keyColor": "blue"
+          },
+          {
+            "type": "cpu",
+            "key": "│ ├󰻠",
+            "keyColor": "green"
+          },
+          {
+            "type": "gpu",
+            "key": "│ ├󰻑",
+            "keyColor": "green"
+          },
+          {
+            "type": "display",
+            "key": "│ ├󰍹",
+            "keyColor": "green",
+            "compactType": "original-with-refresh-rate"
+          },
+          {
+            "type": "memory",
+            "key": "│ ├󰾆",
+            "keyColor": "green"
+          },
+          {
+            "type": "uptime",
+            "key": "│ ├󰅐",
+            "keyColor": "green"
+          },
+          {
+            "type": "sound",
+            "key": " AUDIO",
+            "format": "{2}",
+            "keyColor": "magenta"
+          },
+          {
+            "type": "media",
+            "key": "│ └󰝚",
+            "keyColor": "magenta"
+          },
+          {
+            "type": "custom",
+            "format": "\u001b[90m  \u001b[31m  \u001b[32m  \u001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m  \u001b[38m  \u001b[39m  \u001b[39m    \u001b[38m  \u001b[37m  \u001b[36m  \u001b[35m  \u001b[34m  \u001b[33m  \u001b[32m  \u001b[31m  \u001b[90m "
+          },
+          "break"
+        ]
+      }
+    '';
+  };
 
   programs.bash = {
     enable = true;
+  initExtra = "showcase"; # This will run your combined hardware + tree command
   shellAliases = {
+      # Build & Maintenance
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
       gsync = "git add . && git commit -m \"Sync: $(date +'%Y-%m-%d %H:%M:%S')\" && git push";      
-      editconf = "nano ~/nixos-config/configuration.nix";
-      edithome = "nano ~/nixos-config/home.nix";
-      editapps = "nano ~/nixos-config/system-apps.nix";
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
+      
+      # The Tech Channel Showcase
+      showcase = "fastfetch && echo '' && tree ~/nixos-config";      
+      
+      # Quick Edit Shortcuts
+      editconf = "neovide ~/nixos-config/configuration.nix > /dev/null 2>&1 & disown";
+      edithome = "neovide ~/nixos-config/home.nix > /dev/null 2>&1 & disown";
+      editapps = "neovide ~/nixos-config/system-apps.nix > /dev/null 2>&1 & disown";
+      
+      # Developer tools
       doom = "/home/jacob/.config/emacs/bin/doom";
+      l = "ls -alh";
+      ll = "ls -l";
     };
-    };
-  # 3. Fix the Git warnings for 25.11
+  };
+
   programs.git = {
     enable = true;
     lfs.enable = true;
     settings.user = {
       name = "jacobdt23";
-      email = "turnejac01@gmail.com"; 
+      email = "turnejac01@gmail.com";  
     };
   };
 

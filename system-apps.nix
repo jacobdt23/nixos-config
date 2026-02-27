@@ -1,28 +1,35 @@
 { pkgs, ... }:
 
 {
-  # Allow unfree software for things like Steam or proprietary drivers
   nixpkgs.config.allowUnfree = true;
 
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+  };
+
   environment.systemPackages = with pkgs; [
+    neovide
     kdePackages.kate
     firefox
     git
-    github-desktop    
-    emacs   
-    neovim
+    github-desktop        
+    emacs       
     wget
     curl
     pciutils
     fastfetch
-    protonup-qt  
-    mangohud     
+    protonup-qt   
+    mangohud          
     nvtopPackages.full
     goverlay
-    vulkan-tools 
+    vulkan-tools
+    gnome-disk-utility
+    tree   
   ];
 
-  # Enable Steam (system-level)
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
