@@ -26,7 +26,8 @@
     nvtopPackages.full
     goverlay
     vulkan-tools
-    gnome-disk-utility   
+    gnome-disk-utility
+    tree   
   ];
 
   programs.steam = {
