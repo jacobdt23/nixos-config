@@ -3,7 +3,6 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  # Neovim Wrapper: Makes 'vi' and 'vim' call Neovim
   programs.neovim = {
     enable = true;
     defaultEditor = true;
@@ -12,7 +11,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    neovide           # The hardware-accelerated GUI
+    neovide
     kdePackages.kate
     firefox
     git

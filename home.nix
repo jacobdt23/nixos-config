@@ -8,16 +8,20 @@
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
-    # LazyVim/Neovim Dependencies
+    # Neovim & LazyVim Support
     lua-language-server
-    nil                  # Nix Language Server
-    stylua               # Lua Formatter
+    nil
+    stylua
     ripgrep
     fd
     gcc
     unzip
-    
-    # Personal Apps
+
+    # Titus Fetch Tools
+    fastfetch
+    pciutils
+
+    # Existing Apps
     firefox
     kdePackages.kate
     shellcheck
@@ -26,19 +30,50 @@
     nerd-fonts.symbols-only 
   ];
 
-  # This silences the "Could not watch config file" error
-  home.file.".config/neovide/config.toml".text = ''
-    fork = true
-  '';
-
-  home.sessionPath = [
-    "$HOME/.config/emacs/bin"
-  ];
+  # Silences Neovide and creates the Titus Fetch config
+  home.file = {
+    ".config/neovide/config.toml".text = "fork = true";
+    
+    ".config/fastfetch/config.jsonc".text = ''
+      {
+        "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+        "logo": {
+            "type": "small",
+            "padding": { "top": 2, "left": 2 }
+        },
+        "display": {
+            "separator": " ➜  ",
+            "color": "magenta"
+        },
+        "modules": [
+            "title",
+            "separator",
+            "os",
+            "host",
+            "kernel",
+            "uptime",
+            "packages",
+            "shell",
+            "display",
+            "de",
+            "wm",
+            "terminal",
+            "cpu",
+            "gpu",
+            "memory",
+            "break",
+            "colors"
+        ]
+      }
+    '';
+  };
 
   programs.bash = {
     enable = true;
+    # Auto-run fetch on terminal start
+    initExtra = "fastfetch";
+    
     shellAliases = {
-      # System Management
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
       gsync = "git add . && git commit -m \"Sync: $(date +'%Y-%m-%d %H:%M:%S')\" && git push";      
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
@@ -48,6 +83,7 @@
       editconf = "neovide ~/nixos-config/configuration.nix > /dev/null 2>&1 & disown";
       edithome = "neovide ~/nixos-config/home.nix > /dev/null 2>&1 & disown";
       editapps = "neovide ~/nixos-config/system-apps.nix > /dev/null 2>&1 & disown";
+      
       doom = "/home/jacob/.config/emacs/bin/doom";
     };
   };
