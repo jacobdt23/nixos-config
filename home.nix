@@ -5,49 +5,55 @@
   home.homeDirectory = "/home/jacob";
   home.stateVersion = "25.11";
 
-  # 1. This handles the 'Symbola' and 'Nerd Font' warnings
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
-    # Doom Muscles
+    # Dependencies for Neovim/LazyVim
+    lua-language-server
+    nil                  # Nix Language Server
+    stylua               # Lua Formatter
+    
+    # Existing Tools
     ripgrep
     fd
     gcc
     unzip
     firefox
     kdePackages.kate
-    # Doom Doctor's missing tools
-    shellcheck       # Fixes the :lang sh warning
-    pandoc           # Best markdown compiler for :lang markdown
-    symbola          # Fallback font Doom requested
-    nerd-fonts.symbols-only # The specific icons Doom needs
+    shellcheck
+    pandoc
+    symbola
+    nerd-fonts.symbols-only 
   ];
 
-  # 2. This keeps the 'doom' binary in your path
   home.sessionPath = [
     "$HOME/.config/emacs/bin"
   ];
 
   programs.bash = {
     enable = true;
-  shellAliases = {
+    shellAliases = {
+      # System Management
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
       gsync = "git add . && git commit -m \"Sync: $(date +'%Y-%m-%d %H:%M:%S')\" && git push";      
-      editconf = "nano ~/nixos-config/configuration.nix";
-      edithome = "nano ~/nixos-config/home.nix";
-      editapps = "nano ~/nixos-config/system-apps.nix";
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
+      
+      # GUI Editing Aliases (Neovide)
+      editconf = "neovide ~/nixos-config/configuration.nix & disown";
+      edithome = "neovide ~/nixos-config/home.nix & disown";
+      editapps = "neovide ~/nixos-config/system-apps.nix & disown";
+      
       doom = "/home/jacob/.config/emacs/bin/doom";
     };
-    };
-  # 3. Fix the Git warnings for 25.11
+  };
+
   programs.git = {
     enable = true;
     lfs.enable = true;
     settings.user = {
       name = "jacobdt23";
-      email = "turnejac01@gmail.com"; 
+      email = "turnejac01@gmail.com";  
     };
   };
 
