@@ -174,7 +174,7 @@
       gsync = "git add . && git commit -m \"Sync: $(date +'%Y-%m-%d %H:%M:%S')\" && git push";      
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
-      
+      showcase = "fastfetch && echo '' && tree ~/nixos-config";      
       editconf = "neovide ~/nixos-config/configuration.nix > /dev/null 2>&1 & disown";
       edithome = "neovide ~/nixos-config/home.nix > /dev/null 2>&1 & disown";
       editapps = "neovide ~/nixos-config/system-apps.nix > /dev/null 2>&1 & disown";
