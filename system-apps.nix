@@ -12,6 +12,7 @@
 
   environment.systemPackages = with pkgs; [
     neovide
+    nixpkgs-fmt
     kdePackages.kate
     firefox
     git
