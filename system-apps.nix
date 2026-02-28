@@ -15,19 +15,19 @@
     kdePackages.kate
     firefox
     git
-    github-desktop        
-    emacs       
+    github-desktop
+    emacs
     wget
     curl
     pciutils
     fastfetch
-    protonup-qt   
-    mangohud          
+    protonup-qt
+    mangohud
     nvtopPackages.full
     goverlay
     vulkan-tools
     gnome-disk-utility
-    tree   
+    tree
   ];
 
   programs.steam = {
