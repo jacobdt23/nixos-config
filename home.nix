@@ -21,9 +21,10 @@
     fastfetch
     pciutils
     tree
-    nixpkgs-fmt # Standard formatter for your nix files
+    nixpkgs-fmt
 
     # Productivity & Creative
+    # Note: You use DaVinci Resolve Studio, which is usually in configuration.nix
     firefox
     kdePackages.kate
     shellcheck
@@ -36,7 +37,7 @@
     # Silence Neovide noise
     ".config/neovide/config.toml".text = "fork = true";
 
-    # Custom Fastfetch Config (Chris Titus Style)
+    # Custom Fastfetch Config
     ".config/fastfetch/config.jsonc".text = ''
       {
         "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
@@ -71,28 +72,20 @@
   programs.bash = {
     enable = true;
     initExtra = ''
-      # The Super Sync Function
-      # Usage: gsync "your commit message"
-      gsync() {
-        nixpkgs-fmt ~/nixos-config/*.nix && \
-        sudo nixos-rebuild switch --flake ~/nixos-config#nixos && \
-        git add . && \
-        git commit -m "$1" && \
-        git push && \
-        echo -e "\n\033[1;32m🚀 Golden Build Synced Successfully!\033[0m\n"
-      }
-
       # Run showcase on every new terminal
       showcase
     '';
 
     shellAliases = {
-      # Build & Maintenance
-      rebuild = "nixpkgs-fmt ~/nixos-config/*.nix && sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
+      # THE AUTO-REFLECT REBUILD:
+      # 1. Stages all files (needed for Flakes)
+      # 2. Formats all .nix files
+      # 3. Rebuilds the system
+      # 4. If successful: Commits with timestamp and pushes to GitHub
+      rebuild = "git -C ~/nixos-config add . && nixpkgs-fmt ~/nixos-config/*.nix && sudo nixos-rebuild switch --flake ~/nixos-config#nixos && git -C ~/nixos-config commit -m \"Generation: $(date +'%Y-%m-%d %H:%M:%S')\" && git -C ~/nixos-config push";
+
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
-
-      # Fixed the quoting here to prevent EOF errors
       showcase = "fastfetch && echo \"\" && tree ~/nixos-config";
 
       # Quick Edit Shortcuts
