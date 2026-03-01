@@ -100,12 +100,12 @@
     };
   };
 
-  programs.git = {
-    enable = true;
-    lfs.enable = true;
-    userName = "jacobdt23";
-    userEmail = "turnerjac01@gmail.com";
-  };
+programs.git = {
+  enable = true;
+  lfs.enable = true;
+  settings.user.name = "jacobdt23";
+  settings.user.email = "turnerjac01@gmail.com";
+};
 
   programs.home-manager.enable = true;
 }
