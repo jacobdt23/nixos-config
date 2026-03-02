@@ -29,6 +29,7 @@
     vulkan-tools
     gnome-disk-utility
     tree
+    discord
   ];
 
   programs.steam = {
