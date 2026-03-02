@@ -8,6 +8,7 @@
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
+    # Neovim & Support
     lua-language-server
     nil
     stylua
@@ -15,10 +16,14 @@
     fd
     gcc
     unzip
+
+    # Tech Tools
     fastfetch
     pciutils
     tree
-    nixpkgs-fmt
+    nixpkgs-fmt 
+
+    # Productivity & Creative
     firefox
     kdePackages.kate
     shellcheck
@@ -43,8 +48,7 @@
           { "type": "command", "key": "│ ├", "keyColor": "yellow", "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days" },
           { "type": "shell", "key": "│ └", "keyColor": "yellow" },
           { "type": "wm", "key": " DE/WM", "keyColor": "blue" },
-          { "type": "wmtheme", "key": "│ ├󰉼", "keyColor": "blue" },
-          "icons", "cursor", "terminal", "cpu", "gpu", "display", "memory", "uptime",
+          "wmtheme", "icons", "cursor", "terminal", "cpu", "gpu", "display", "memory", "uptime",
           { "type": "sound", "key": " AUDIO", "format": "{2}", "keyColor": "magenta" },
           "media",
           { "type": "custom", "format": "\u001b[90m  \u001b[31m  \u001b[32m  \u001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m  \u001b[38m  \u001b[39m  \u001b[39m    \u001b[38m  \u001b[37m  \u001b[36m  \u001b[35m  \u001b[34m  \u001b[33m  \u001b[32m  \u001b[31m  \u001b[90m " },
@@ -57,15 +61,17 @@
   programs.bash = {
     enable = true;
     initExtra = ''
-      # THE ULTIMATE SMART REBUILD
-      # Usage: rebuild                     <- Uses date as name
-      # Usage: rebuild "updated nvidia"    <- Uses your text as name
+      # THE ULTIMATE SMART REBUILD (v3 - Sync-First)
       function rebuild {
-        # 1. Get current generation number (optional but cool)
+        # Ensure we are in sync with GitHub before starting
+        echo -e "\033[1;33m--- Pulling latest changes from GitHub ---\033[0m"
+        git -C ~/nixos-config pull --rebase
+
+        # Get local system info
         local gen=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
         local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
         
-        # 2. Logic: Use your text if you typed it, otherwise use Gen + Date
+        # Use first argument as message, else use Gen/Date
         local msg="''${1:-Gen $gen: $timestamp}"
 
         echo -e "\033[1;34m--- Preparing NixOS Configs ($timestamp) ---\033[0m"
@@ -87,6 +93,9 @@
     '';
 
     shellAliases = {
+      # Log alias: Limited to last 5 for speed
+      history = "git -C ~/nixos-config log --oneline -n 5";
+      
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
       showcase = "fastfetch && echo \"\" && tree ~/nixos-config";
@@ -94,7 +103,6 @@
       edithome = "neovide ~/nixos-config/home.nix > /dev/null 2>&1 & disown";
       editapps = "neovide ~/nixos-config/system-apps.nix > /dev/null 2>&1 & disown";
       doom = "/home/jacob/.config/emacs/bin/doom";
-      history = "git -C ~/nixos-config log --oneline -n 5";
       l = "ls -alh";
       ll = "ls -l";
     };
