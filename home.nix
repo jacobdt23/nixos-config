@@ -94,6 +94,7 @@
       edithome = "neovide ~/nixos-config/home.nix > /dev/null 2>&1 & disown";
       editapps = "neovide ~/nixos-config/system-apps.nix > /dev/null 2>&1 & disown";
       doom = "/home/jacob/.config/emacs/bin/doom";
+      history = "git -C ~/nixos-config log --oneline -n 5";
       l = "ls -alh";
       ll = "ls -l";
     };
