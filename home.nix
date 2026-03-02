@@ -8,7 +8,6 @@
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
-    # Neovim & LazyVim Support
     lua-language-server
     nil
     stylua
@@ -16,14 +15,10 @@
     fd
     gcc
     unzip
-
-    # Tech Tools
     fastfetch
     pciutils
     tree
     nixpkgs-fmt 
-
-    # Productivity & Creative
     firefox
     kdePackages.kate
     shellcheck
@@ -33,10 +28,8 @@
   ];
 
   home.file = {
-    # Silence Neovide noise
     ".config/neovide/config.toml".text = "fork = true";
 
-    # Custom Fastfetch Config
     ".config/fastfetch/config.jsonc".text = ''
       {
         "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
@@ -51,16 +44,9 @@
           { "type": "shell", "key": "│ └", "keyColor": "yellow" },
           { "type": "wm", "key": " DE/WM", "keyColor": "blue" },
           { "type": "wmtheme", "key": "│ ├󰉼", "keyColor": "blue" },
-          { "type": "icons", "key": "│ ├󰀻", "keyColor": "blue" },
-          { "type": "cursor", "key": "│ ├", "keyColor": "blue" },
-          { "type": "terminal", "key": "│ └", "keyColor": "blue" },
-          { "type": "cpu", "key": "│ ├󰻠", "keyColor": "green" },
-          { "type": "gpu", "key": "│ ├󰻑", "keyColor": "green" },
-          { "type": "display", "key": "│ ├󰍹", "keyColor": "green", "compactType": "original-with-refresh-rate" },
-          { "type": "memory", "key": "│ ├󰾆", "keyColor": "green" },
-          { "type": "uptime", "key": "│ ├󰅐", "keyColor": "green" },
+          "icons", "cursor", "terminal", "cpu", "gpu", "display", "memory", "uptime",
           { "type": "sound", "key": " AUDIO", "format": "{2}", "keyColor": "magenta" },
-          { "type": "media", "key": "│ └󰝚", "keyColor": "magenta" },
+          "media",
           { "type": "custom", "format": "\u001b[90m  \u001b[31m  \u001b[32m  \u001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m  \u001b[38m  \u001b[39m  \u001b[39m    \u001b[38m  \u001b[37m  \u001b[36m  \u001b[35m  \u001b[34m  \u001b[33m  \u001b[32m  \u001b[31m  \u001b[90m " },
           "break"
         ]
@@ -71,33 +57,32 @@
   programs.bash = {
     enable = true;
     initExtra = ''
-      # THE ULTIMATE ONE-WORD REBUILD
-      # Using 'function name' syntax to avoid Bash parsing errors in Nix
+      # THE ULTIMATE SMART REBUILD
+      # Usage: rebuild                     <- Uses date as name
+      # Usage: rebuild "updated nvidia"    <- Uses your text as name
       function rebuild {
+        # 1. Get current generation number (optional but cool)
+        local gen=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
         local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
-        local msg="Generation: $timestamp"
+        
+        # 2. Logic: Use your text if you typed it, otherwise use Gen + Date
+        local msg="''${1:-Gen $gen: $timestamp}"
 
         echo -e "\033[1;34m--- Preparing NixOS Configs ($timestamp) ---\033[0m"
 
-        # 1. Stage changes so Flakes can see them
         git -C ~/nixos-config add .
-
-        # 2. Format
         nixpkgs-fmt ~/nixos-config/*.nix
 
-        # 3. Build System (proceed only if successful)
         if sudo nixos-rebuild switch --flake ~/nixos-config#nixos; then
-          # 4. Commit and Push automatically
           git -C ~/nixos-config commit -m "$msg"
           git -C ~/nixos-config push
-          echo -e "\n\033[1;32m🚀 System Updated & Pushed to GitHub Successfully!\033[0m\n"
+          echo -e "\n\033[1;32m🚀 Update complete: $msg\033[0m\n"
         else
-          echo -e "\n\033[1;31m❌ Rebuild Failed. Nothing was pushed to GitHub.\033[0m\n"
+          echo -e "\n\033[1;31m❌ Rebuild failed. No push to GitHub.\033[0m\n"
           return 1
         fi
       }
 
-      # Run showcase on every new terminal
       showcase
     '';
 
@@ -114,7 +99,6 @@
     };
   };
 
-  # Fixed the Git settings to remove evaluation warnings
   programs.git = {
     enable = true;
     lfs.enable = true;
