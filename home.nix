@@ -21,10 +21,9 @@
     fastfetch
     pciutils
     tree
-    nixpkgs-fmt
+    nixpkgs-fmt 
 
     # Productivity & Creative
-    # Note: You use DaVinci Resolve Studio, which is usually in configuration.nix
     firefox
     kdePackages.kate
     shellcheck
@@ -72,39 +71,57 @@
   programs.bash = {
     enable = true;
     initExtra = ''
+      # THE ULTIMATE ONE-WORD REBUILD
+      # Using 'function name' syntax to avoid Bash parsing errors in Nix
+      function rebuild {
+        local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+        local msg="Generation: $timestamp"
+
+        echo -e "\033[1;34m--- Preparing NixOS Configs ($timestamp) ---\033[0m"
+
+        # 1. Stage changes so Flakes can see them
+        git -C ~/nixos-config add .
+
+        # 2. Format
+        nixpkgs-fmt ~/nixos-config/*.nix
+
+        # 3. Build System (proceed only if successful)
+        if sudo nixos-rebuild switch --flake ~/nixos-config#nixos; then
+          # 4. Commit and Push automatically
+          git -C ~/nixos-config commit -m "$msg"
+          git -C ~/nixos-config push
+          echo -e "\n\033[1;32m🚀 System Updated & Pushed to GitHub Successfully!\033[0m\n"
+        else
+          echo -e "\n\033[1;31m❌ Rebuild Failed. Nothing was pushed to GitHub.\033[0m\n"
+          return 1
+        fi
+      }
+
       # Run showcase on every new terminal
       showcase
     '';
 
     shellAliases = {
-      # THE AUTO-REFLECT REBUILD:
-      # 1. Stages all files (needed for Flakes)
-      # 2. Formats all .nix files
-      # 3. Rebuilds the system
-      # 4. If successful: Commits with timestamp and pushes to GitHub
-      rebuild = "git -C ~/nixos-config add . && nixpkgs-fmt ~/nixos-config/*.nix && sudo nixos-rebuild switch --flake ~/nixos-config#nixos && git -C ~/nixos-config commit -m \"Generation: $(date +'%Y-%m-%d %H:%M:%S')\" && git -C ~/nixos-config push";
-
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
       showcase = "fastfetch && echo \"\" && tree ~/nixos-config";
-
-      # Quick Edit Shortcuts
       editconf = "neovide ~/nixos-config/configuration.nix > /dev/null 2>&1 & disown";
       edithome = "neovide ~/nixos-config/home.nix > /dev/null 2>&1 & disown";
       editapps = "neovide ~/nixos-config/system-apps.nix > /dev/null 2>&1 & disown";
-
-      # Tooling
       doom = "/home/jacob/.config/emacs/bin/doom";
       l = "ls -alh";
       ll = "ls -l";
     };
   };
 
+  # Fixed the Git settings to remove evaluation warnings
   programs.git = {
     enable = true;
     lfs.enable = true;
-    settings.user.name = "jacobdt23";
-    settings.user.email = "turnerjac01@gmail.com";
+    settings = {
+      user.name = "jacobdt23";
+      user.email = "turnerjac01@gmail.com";
+    };
   };
 
   programs.home-manager.enable = true;
