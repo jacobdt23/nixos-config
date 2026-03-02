@@ -5,9 +5,9 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    davinci-resolve  # The heavy lifter
-    obs-studio       # For recording tutorials or streaming
-    vlc              # For checking renders
+    davinci-resolve # The heavy lifter
+    obs-studio # For recording tutorials or streaming
+    vlc # For checking renders
   ];
 
   # This is the "secret sauce" for Nvidia hardware acceleration in Resolve
