@@ -18,7 +18,7 @@
     fastfetch
     pciutils
     tree
-    nixpkgs-fmt 
+    nixpkgs-fmt
     firefox
     kdePackages.kate
     shellcheck
