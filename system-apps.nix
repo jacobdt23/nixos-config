@@ -1,6 +1,6 @@
 { pkgs, ... }:
 
-# Smart Sync Test
+# V5 Test
 
 {
   nixpkgs.config.allowUnfree = true;
