@@ -21,7 +21,7 @@
     fastfetch
     pciutils
     tree
-    nixpkgs-fmt  
+    nixpkgs-fmt
 
     # Productivity & Creative
     firefox
