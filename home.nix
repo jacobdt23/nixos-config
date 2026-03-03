@@ -21,7 +21,7 @@
     fastfetch
     pciutils
     tree
-    nixpkgs-fmt
+    nixpkgs-fmt  
 
     # Productivity & Creative
     firefox
@@ -61,29 +61,31 @@
   programs.bash = {
     enable = true;
     initExtra = ''
-      # THE ULTIMATE SMART REBUILD (v4 - Auto-Detective)
+      # THE ULTIMATE SMART REBUILD (v5 - Bulletproof Sync)
       function rebuild {
-        # 1. Sync with GitHub first to avoid conflicts
-        echo -e "\033[1;33m--- Pulling latest changes from GitHub ---\033[0m"
+        # 1. Stage changes IMMEDIATELY so pull/rebase works
+        git -C ~/nixos-config add .
+
+        # 2. Now sync with GitHub
+        echo -e "\033[1;33m--- Syncing with GitHub ---\033[0m"
         git -C ~/nixos-config pull --rebase
 
-        # 2. Stage changes to detect what they are
-        git -C ~/nixos-config add .
+        # 3. Detective work: What actually changed?
         local files_changed=$(git -C ~/nixos-config diff --cached --name-only | tr '\n' ' ' | sed 's/ $//')
         local stats=$(git -C ~/nixos-config diff --cached --shortstat | sed 's/^ //')
-
-        # 3. Get system info
+        
+        # 4. System info
         local gen=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
         local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
         
-        # 4. Handle Empty Changes (if you run rebuild with nothing new)
+        # 5. Build the message
         if [ -z "$files_changed" ]; then
-           local auto_msg="Gen $gen ($timestamp): Routine maintenance / No file changes detected"
+           local auto_msg="Gen $gen ($timestamp): Routine maintenance"
         else
            local auto_msg="Gen $gen ($timestamp): $files_changed | $stats"
         fi
 
-        # 5. Use custom message if provided, else use auto-detective msg
+        # Use first argument if provided, else the detective message
         local msg="''${1:-$auto_msg}"
 
         echo -e "\033[1;34m--- Preparing NixOS Configs ($timestamp) ---\033[0m"
