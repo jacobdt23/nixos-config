@@ -21,7 +21,7 @@
     fastfetch
     pciutils
     tree
-    nixpkgs-fmt 
+    nixpkgs-fmt  
 
     # Productivity & Creative
     firefox
@@ -61,22 +61,36 @@
   programs.bash = {
     enable = true;
     initExtra = ''
-      # THE ULTIMATE SMART REBUILD (v3 - Sync-First)
+      # THE ULTIMATE SMART REBUILD (v4 - Auto-Detective)
       function rebuild {
-        # Ensure we are in sync with GitHub before starting
+        # 1. Sync with GitHub first to avoid conflicts
         echo -e "\033[1;33m--- Pulling latest changes from GitHub ---\033[0m"
         git -C ~/nixos-config pull --rebase
 
-        # Get local system info
+        # 2. Stage changes to detect what they are
+        git -C ~/nixos-config add .
+        local files_changed=$(git -C ~/nixos-config diff --cached --name-only | tr '\n' ' ' | sed 's/ $//')
+        local stats=$(git -C ~/nixos-config diff --cached --shortstat | sed 's/^ //')
+
+        # 3. Get system info
         local gen=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
         local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
         
-        # Use first argument as message, else use Gen/Date
-        local msg="''${1:-Gen $gen: $timestamp}"
+        # 4. Handle Empty Changes (if you run rebuild with nothing new)
+        if [ -z "$files_changed" ]; then
+           local auto_msg="Gen $gen ($timestamp): Routine maintenance / No file changes detected"
+        else
+           local auto_msg="Gen $gen ($timestamp): $files_changed | $stats"
+        fi
+
+        # 5. Use custom message if provided, else use auto-detective msg
+        local msg="''${1:-$auto_msg}"
 
         echo -e "\033[1;34m--- Preparing NixOS Configs ($timestamp) ---\033[0m"
+        if [ ! -z "$files_changed" ]; then
+           echo -e "\033[1;32mDetected changes in: $files_changed\033[0m"
+        fi
 
-        git -C ~/nixos-config add .
         nixpkgs-fmt ~/nixos-config/*.nix
 
         if sudo nixos-rebuild switch --flake ~/nixos-config#nixos; then
@@ -93,9 +107,7 @@
     '';
 
     shellAliases = {
-      # Log alias: Limited to last 5 for speed
       history = "git -C ~/nixos-config log --oneline -n 5";
-      
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
       showcase = "fastfetch && echo \"\" && tree ~/nixos-config";
