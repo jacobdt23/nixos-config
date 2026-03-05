@@ -24,7 +24,6 @@
     nixpkgs-fmt
 
     # Productivity & Creative
-    firefox
     kdePackages.kate
     shellcheck
     pandoc
