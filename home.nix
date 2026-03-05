@@ -62,36 +62,24 @@
     initExtra = ''
       # THE ULTIMATE SMART REBUILD (v5 - Bulletproof Sync)
       function rebuild {
-        # 1. Stage changes IMMEDIATELY so pull/rebase works
         git -C ~/nixos-config add .
-
-        # 2. Now sync with GitHub
         echo -e "\033[1;33m--- Syncing with GitHub ---\033[0m"
         git -C ~/nixos-config pull --rebase
 
-        # 3. Detective work: What actually changed?
         local files_changed=$(git -C ~/nixos-config diff --cached --name-only | tr '\n' ' ' | sed 's/ $//')
         local stats=$(git -C ~/nixos-config diff --cached --shortstat | sed 's/^ //')
-        
-        # 4. System info
         local gen=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
         local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
-        
-        # 5. Build the message
+
         if [ -z "$files_changed" ]; then
-           local auto_msg="Gen $gen ($timestamp): Routine maintenance"
+          local auto_msg="Gen $gen ($timestamp): Routine maintenance"
         else
-           local auto_msg="Gen $gen ($timestamp): $files_changed | $stats"
+          local auto_msg="Gen $gen ($timestamp): $files_changed | $stats"
         fi
 
-        # Use first argument if provided, else the detective message
         local msg="''${1:-$auto_msg}"
 
         echo -e "\033[1;34m--- Preparing NixOS Configs ($timestamp) ---\033[0m"
-        if [ ! -z "$files_changed" ]; then
-           echo -e "\033[1;32mDetected changes in: $files_changed\033[0m"
-        fi
-
         nixpkgs-fmt ~/nixos-config/*.nix
 
         if sudo nixos-rebuild switch --flake ~/nixos-config#nixos; then
@@ -102,30 +90,23 @@
           echo -e "\n\033[1;31m❌ Rebuild failed. No push to GitHub.\033[0m\n"
           return 1
         fi
-      
-        # THE MAINTENANCE ENGINE (v1 - Deep Clean & Optimize)
-        function maintenance {
+      }
+
+      # THE MAINTENANCE ENGINE (v1 - Deep Clean & Optimize)
+      function maintenance {
         echo -e "\033[1;35m--- Starting Deep System Maintenance ---\033[0m"
-  
-        # 1. Update Flake inputs (Get the latest 25.11 patches)
         echo -e "\033[1;34mUpdating Flake inputs...\033[0m"
         nix flake update --flake ~/nixos-config
-  
-       # 2. Run the Rebuild to apply any input updates
-       rebuild "chore: weekly maintenance and flake update"
+        
+        rebuild "chore: weekly maintenance and flake update"
 
-       # 3. Garbage Collection (Delete everything older than 7 days)
-       echo -e "\033[1;33mCollecting Garbage...\033[0m"
-       sudo nix-collect-garbage --delete-older-than 7d
-  
-       # 4. Store Optimization (Hard-link identical files to save GBs)
-       echo -e "\033[1;32mOptimising Nix Store...\033[0m"
-       nix-store --optimise
+        echo -e "\033[1;33mCollecting Garbage...\033[0m"
+        sudo nix-collect-garbage --delete-older-than 7d
+        
+        echo -e "\033[1;32mOptimising Nix Store...\033[0m"
+        nix-store --optimise
 
-       echo -e "\033[1;36m✨ Maintenance Complete! System is Golden. ✨\033[0m"
-   }
-
-
+        echo -e "\033[1;36m✨ Maintenance Complete! System is Golden. ✨\033[0m"
       }
 
       showcase
