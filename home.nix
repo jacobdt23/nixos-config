@@ -102,6 +102,30 @@
           echo -e "\n\033[1;31m❌ Rebuild failed. No push to GitHub.\033[0m\n"
           return 1
         fi
+      
+        # THE MAINTENANCE ENGINE (v1 - Deep Clean & Optimize)
+        function maintenance {
+        echo -e "\033[1;35m--- Starting Deep System Maintenance ---\033[0m"
+  
+        # 1. Update Flake inputs (Get the latest 25.11 patches)
+        echo -e "\033[1;34mUpdating Flake inputs...\033[0m"
+        nix flake update --flake ~/nixos-config
+  
+       # 2. Run the Rebuild to apply any input updates
+       rebuild "chore: weekly maintenance and flake update"
+
+       # 3. Garbage Collection (Delete everything older than 7 days)
+       echo -e "\033[1;33mCollecting Garbage...\033[0m"
+       sudo nix-collect-garbage --delete-older-than 7d
+  
+       # 4. Store Optimization (Hard-link identical files to save GBs)
+       echo -e "\033[1;32mOptimising Nix Store...\033[0m"
+       nix-store --optimise
+
+       echo -e "\033[1;36m✨ Maintenance Complete! System is Golden. ✨\033[0m"
+   }
+
+
       }
 
       showcase
