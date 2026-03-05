@@ -13,10 +13,10 @@
   };
 
   environment.systemPackages = with pkgs; [
+    brave
     neovide
     nixpkgs-fmt
     kdePackages.kate
-    firefox
     git
     github-desktop
     emacs
