@@ -3,13 +3,16 @@
 {
   services.xserver.videoDrivers = [ "nvidia" ];
 
+  # UNLOCK BLACKWELL FPS: Disables GSP firmware which often caps 50-series FPS on Linux
+  boot.kernelParams = [ "nvidia.NVreg_EnableGpuFirmware=0" ];
+
   hardware.nvidia = {
-    # Required for RTX 50-series: The open-source kernel module
-    open = true;
+    open = true; # REQUIRED for Blackwell
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     modesetting.enable = true;
-    powerManagement.enable = true;
+    # Disable experimental power management to prevent FPS drops
+    powerManagement.enable = false; 
   };
 
   hardware.graphics = {
@@ -17,20 +20,18 @@
     enable32Bit = true;
     extraPackages = with pkgs; [
       nvidia-vaapi-driver
-      libva-vdpau-driver # Fixed: vaapiVdpau was renamed to this
+      libva-vdpau-driver
       libvdpau-va-gl
     ];
   };
 
-  # Global Session Variables for Wayland & NVENC discovery
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    # Point applications to the NVIDIA-specific EGL layer
+    # Force Wayland to use the NVIDIA EGL layer correctly
     __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json";
   };
 
-  # Blackwell thrives on the 6.18+ kernel
   boot.kernelPackages = pkgs.linuxPackages_6_18;
 }

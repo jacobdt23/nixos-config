@@ -2,25 +2,24 @@
 
 {
   nixpkgs.config.allowUnfree = true;
-
-  # Global CUDA support ensures FFmpeg and OBS can 'see' the 5070's cores
   nixpkgs.config.cudaSupport = true;
 
+  # Enable Gamescope system-wide
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true; # Allows Gamescope to prioritize game threads
+  };
+
   environment.systemPackages = with pkgs; [
-    # --- Standard Apps ---
     brave neovide nixpkgs-fmt kdePackages.kate git
     github-desktop emacs wget curl pciutils fastfetch
-    tree discord
-    
-    # --- Hardware & Gaming ---
-    protonup-qt mangohud goverlay vulkan-tools gnome-disk-utility
-    nvtopPackages.full # Essential for monitoring Blackwell usage
+    tree discord protonup-qt mangohud nvtopPackages.full
+    goverlay vulkan-tools gnome-disk-utility gamemode
   ];
 
-  # THE "GOLDEN" OBS MODULE
+  # THE OFFICIAL OBS MODULE
   programs.obs-studio = {
     enable = true;
-    # We override the package to force the FFmpeg 7 + CUDA handshake
     package = pkgs.obs-studio.override {
       ffmpeg = pkgs.ffmpeg_7-full;
       cudaSupport = true;
