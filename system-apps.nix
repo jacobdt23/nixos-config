@@ -12,10 +12,25 @@
   programs.gamemode.enable = true;
 
   environment.systemPackages = with pkgs; [
-    brave neovide nixpkgs-fmt kdePackages.kate git
-    github-desktop emacs wget curl pciutils fastfetch
-    tree discord protonup-qt mangohud nvtopPackages.full
-    goverlay vulkan-tools gnome-disk-utility
+    brave
+    neovide
+    nixpkgs-fmt
+    kdePackages.kate
+    git
+    github-desktop
+    emacs
+    wget
+    curl
+    pciutils
+    fastfetch
+    tree
+    discord
+    protonup-qt
+    mangohud
+    nvtopPackages.full
+    goverlay
+    vulkan-tools
+    gnome-disk-utility
     # Added for Gamescope compatibility
     vulkan-loader
     vulkan-validation-layers

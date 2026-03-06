@@ -3,15 +3,15 @@
 {
   services.xserver.videoDrivers = [ "nvidia" ];
 
-  boot.kernelParams = [ 
-    "nvidia-drm.modeset=1" 
+  boot.kernelParams = [
+    "nvidia-drm.modeset=1"
     "nvidia-drm.fbdev=1" # Essential for Gamescope on KDE Wayland
-    "nvidia.NVreg_EnableGpuFirmware=0" 
+    "nvidia.NVreg_EnableGpuFirmware=0"
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1" # Prevents crashes on launch
   ];
 
   hardware.nvidia = {
-    open = true; 
+    open = true;
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     modesetting.enable = true;
