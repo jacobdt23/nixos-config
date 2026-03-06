@@ -3,44 +3,27 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-  };
+  # Global CUDA support ensures FFmpeg and OBS can 'see' the 5070's cores
+  nixpkgs.config.cudaSupport = true;
 
   environment.systemPackages = with pkgs; [
     # --- Standard Apps ---
-    brave
-    neovide
-    nixpkgs-fmt
-    kdePackages.kate
-    git
-    github-desktop
-    emacs
-    wget
-    curl
-    pciutils
-    fastfetch
-    tree
-    discord
-
+    brave neovide nixpkgs-fmt kdePackages.kate git
+    github-desktop emacs wget curl pciutils fastfetch
+    tree discord
+    
     # --- Hardware & Gaming ---
-    protonup-qt
-    mangohud
-    nvtopPackages.full
-    goverlay
-    vulkan-tools
-    gnome-disk-utility
+    protonup-qt mangohud goverlay vulkan-tools gnome-disk-utility
+    nvtopPackages.full # Essential for monitoring Blackwell usage
   ];
 
-  # THE OFFICIAL OBS MODULE
-  # This handles the LD_LIBRARY_PATH and wrapper for you automatically.
+  # THE "GOLDEN" OBS MODULE
   programs.obs-studio = {
     enable = true;
+    # We override the package to force the FFmpeg 7 + CUDA handshake
     package = pkgs.obs-studio.override {
       ffmpeg = pkgs.ffmpeg_7-full;
+      cudaSupport = true;
     };
     plugins = with pkgs.obs-studio-plugins; [
       obs-vaapi
@@ -49,9 +32,5 @@
     ];
   };
 
-  programs.steam = {
-    enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-  };
+  programs.steam.enable = true;
 }
