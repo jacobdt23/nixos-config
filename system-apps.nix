@@ -1,54 +1,30 @@
 { pkgs, ... }:
 
 {
-  # 1. Global unfree config for NVIDIA/Steam/Discord
   nixpkgs.config.allowUnfree = true;
 
-  # 2. Neovim Configuration
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-  };
-
-  # 3. System-wide Package List
+  # Standard packages (REMOVED obs-studio from here)
   environment.systemPackages = with pkgs; [
-    # --- Standard Applications ---
-    brave
-    neovide
-    nixpkgs-fmt
-    kdePackages.kate
-    git
-    github-desktop
-    emacs
-    wget
-    curl
-    pciutils
-    fastfetch
-    tree
-    discord
-
-    # --- Hardware & Gaming Tools ---
-    protonup-qt
-    mangohud
-    nvtopPackages.full # Full NVIDIA/AMD monitoring
-    goverlay
-    vulkan-tools
-    gnome-disk-utility
-
-    # --- The "Golden" OBS Setup ---
-    # This override ensures OBS is built with the full FFmpeg 7 
-    # toolkit required for native Blackwell NVENC/AV1 support.
-    (obs-studio.override {
-      ffmpeg = ffmpeg_7-full;
-    })
+    brave neovide nixpkgs-fmt kdePackages.kate git
+    github-desktop emacs wget curl pciutils fastfetch
+    tree discord protonup-qt mangohud nvtopPackages.full
+    goverlay vulkan-tools gnome-disk-utility
   ];
 
-  # 4. Steam & Gaming Infrastructure
-  programs.steam = {
+  # THE OFFICIAL OBS MODULE (The "Better Way")
+  programs.obs-studio = {
     enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
+    # This override is the secret sauce for NVENC on Blackwell
+    package = pkgs.obs-studio.override {
+      ffmpeg = pkgs.ffmpeg_7-full;
+      cudaSupport = true;
+    };
+    plugins = with pkgs.obs-studio-plugins; [
+      obs-vaapi
+      obs-vkcapture
+      obs-pipewire-audio-capture
+    ];
   };
+
+  programs.steam.enable = true;
 }
