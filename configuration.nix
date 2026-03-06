@@ -30,16 +30,16 @@
   };
 
   boot.loader.efi.canTouchEfiVariables = true;
-  
+
   # 1. Kill the GRUB wait (Standard is usually 5s or more)
-  boot.loader.timeout = 1; 
+  boot.loader.timeout = 1;
 
   # 2. Parallelize the remaining network bits
   systemd.network.wait-online.enable = false;
 
   # 3. Clean up the Kernel Console (Optional)
   # This stops the text "scrolling" which can sometimes slightly slow the transition to SDDM
-  boot.consoleLogLevel = 0; 
+  boot.consoleLogLevel = 0;
   boot.initrd.verbose = false;
 
 
