@@ -19,7 +19,7 @@
     enable32Bit = true;
     extraPackages = with pkgs; [
       nvidia-vaapi-driver
-      libva-vdpau-driver # Fixed: replaced vaapiVdpau
+      libva-vdpau-driver
       libvdpau-va-gl
     ];
   };

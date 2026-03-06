@@ -1,7 +1,5 @@
 { pkgs, ... }:
 
-# V5 Test
-
 {
   nixpkgs.config.allowUnfree = true;
 
@@ -13,6 +11,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    # --- Standard Apps ---
     brave
     neovide
     nixpkgs-fmt
@@ -32,6 +31,11 @@
     gnome-disk-utility
     tree
     discord
+
+    # --- Wrapped OBS with Blackwell/NVENC Support ---
+    (obs-studio.override {
+      ffmpeg = ffmpeg_7-full;
+    })
   ];
 
   programs.steam = {
