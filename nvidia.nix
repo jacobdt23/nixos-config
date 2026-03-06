@@ -26,6 +26,8 @@
 
   # 3. Environment Variables for OBS/Wayland
   environment.variables = {
+    WLR_NO_HARDWARE_CURSORS = "1"; # Helps with screen capture
+    NIXOS_OZONE_WL = "1";          # Forces Electron/OBS to use Wayland properly
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
