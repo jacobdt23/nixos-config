@@ -5,28 +5,32 @@
   services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.nvidia = {
-    # 2. Required for 50-series (Blackwell): Use the open-source kernel module
+    # Required for 50-series (Blackwell): Use the open-source kernel module
     open = true;
-
-    # 3. Enable the Nvidia settings menu
     nvidiaSettings = true;
-
-    # 4. Driver version: Using the stable branch for Blackwell
     package = config.boot.kernelPackages.nvidiaPackages.stable;
-
-    # 5. Enable Modesetting (Mandatory for Wayland/Plasma 6)
     modesetting.enable = true;
-
-    # 6. Power Management (Prevents flickering/glitches after sleep)
     powerManagement.enable = true;
   };
 
-  # 7. Hardware Acceleration (For DaVinci Resolve & Firefox)
+  # 2. Hardware Acceleration & NVENC support (Corrected for 25.11)
   hardware.graphics = {
     enable = true;
-    enable32Bit = true; # Critical for Steam games
+    enable32Bit = true;
+    extraPackages = with pkgs; [
+      nvidia-vaapi-driver
+      libva-vdpau-driver # Fixed: replaced vaapiVdpau
+      libvdpau-va-gl
+    ];
   };
 
-  # 8. Blackwell Support: Target the 6.18 kernel for best compatibility
+  # 3. Environment Variables for OBS/Wayland
+  environment.variables = {
+    LIBVA_DRIVER_NAME = "nvidia";
+    GBM_BACKEND = "nvidia-drm";
+    __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+  };
+
+  # 4. Blackwell Support: Target the 6.18 kernel
   boot.kernelPackages = pkgs.linuxPackages_6_18;
 }
