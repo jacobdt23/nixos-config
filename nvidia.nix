@@ -4,7 +4,7 @@
   services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.nvidia = {
-    open = true; # Required for Blackwell (50-series)
+    open = true;
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     modesetting.enable = true;
@@ -21,10 +21,13 @@
     ];
   };
 
-  environment.variables = {
+  # Use sessionVariables to ensure KDE/Wayland picks them up correctly
+  environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    # Helps modern apps find the NVIDIA-specific EGL layer
+    __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json";
   };
 
   boot.kernelPackages = pkgs.linuxPackages_6_18;

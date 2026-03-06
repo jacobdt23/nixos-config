@@ -1,9 +1,20 @@
 { pkgs, ... }:
 
 {
+  # 1. Global unfree config for NVIDIA/Steam/Discord
   nixpkgs.config.allowUnfree = true;
 
+  # 2. Neovim Configuration
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+  };
+
+  # 3. System-wide Package List
   environment.systemPackages = with pkgs; [
+    # --- Standard Applications ---
     brave
     neovide
     nixpkgs-fmt
@@ -15,28 +26,26 @@
     curl
     pciutils
     fastfetch
-    protonup-qt
-    mangohud
-    nvtopPackages.full
-    goverlay
-    vulkan-tools
-    gnome-disk-utility
     tree
     discord
 
-    # --- Wrapped OBS with Blackwell/NVENC Driver Access ---
-    (symlinkJoin {
-      name = "obs-studio-wrapped";
-      paths = [ obs-studio ];
-      buildInputs = [ makeWrapper ];
-      postBuild = ''
-        wrapProgram $out/bin/obs \
-          --prefix LD_LIBRARY_PATH : /run/opengl-driver/lib \
-          --set LIBVA_DRIVER_NAME nvidia
-      '';
+    # --- Hardware & Gaming Tools ---
+    protonup-qt
+    mangohud
+    nvtopPackages.full # Full NVIDIA/AMD monitoring
+    goverlay
+    vulkan-tools
+    gnome-disk-utility
+
+    # --- The "Golden" OBS Setup ---
+    # This override ensures OBS is built with the full FFmpeg 7 
+    # toolkit required for native Blackwell NVENC/AV1 support.
+    (obs-studio.override {
+      ffmpeg = ffmpeg_7-full;
     })
   ];
 
+  # 4. Steam & Gaming Infrastructure
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
