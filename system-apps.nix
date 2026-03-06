@@ -3,15 +3,7 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-  };
-
   environment.systemPackages = with pkgs; [
-    # --- Standard Apps ---
     brave
     neovide
     nixpkgs-fmt
@@ -32,9 +24,16 @@
     tree
     discord
 
-    # --- Wrapped OBS with Blackwell/NVENC Support ---
-    (obs-studio.override {
-      ffmpeg = ffmpeg_7-full;
+    # --- Wrapped OBS with Blackwell/NVENC Driver Access ---
+    (symlinkJoin {
+      name = "obs-studio-wrapped";
+      paths = [ obs-studio ];
+      buildInputs = [ makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/obs \
+          --prefix LD_LIBRARY_PATH : /run/opengl-driver/lib \
+          --set LIBVA_DRIVER_NAME nvidia
+      '';
     })
   ];
 
