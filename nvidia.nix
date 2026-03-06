@@ -3,16 +3,19 @@
 {
   services.xserver.videoDrivers = [ "nvidia" ];
 
-  # UNLOCK BLACKWELL FPS: Disables GSP firmware which often caps 50-series FPS on Linux
-  boot.kernelParams = [ "nvidia.NVreg_EnableGpuFirmware=0" ];
+  # CRITICAL: nvidia-drm.modeset=1 is required for Gamescope to launch on NVIDIA.
+  # nvidia.NVreg_EnableGpuFirmware=0 fixes the 50-series FPS cap.
+  boot.kernelParams = [ 
+    "nvidia-drm.modeset=1" 
+    "nvidia.NVreg_EnableGpuFirmware=0" 
+  ];
 
   hardware.nvidia = {
-    open = true; # REQUIRED for Blackwell
+    open = true; 
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
-    modesetting.enable = true;
-    # Disable experimental power management to prevent FPS drops
-    powerManagement.enable = false; 
+    modesetting.enable = true; # Required for Wayland/Gamescope
+    powerManagement.enable = false;
   };
 
   hardware.graphics = {
@@ -29,7 +32,6 @@
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    # Force Wayland to use the NVIDIA EGL layer correctly
     __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json";
   };
 
