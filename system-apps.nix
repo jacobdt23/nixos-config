@@ -4,14 +4,10 @@
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.cudaSupport = true;
 
-  programs.gamescope = {
-    enable = true;
-    capSysNice = true;
-  };
-
   programs.gamemode.enable = true;
 
   environment.systemPackages = with pkgs; [
+    # --- Standard Apps ---
     brave
     neovide
     nixpkgs-fmt
@@ -25,18 +21,18 @@
     fastfetch
     tree
     discord
-    protonup-qt
-    mangohud
+
+    # --- Performance & Gaming ---
     nvtopPackages.full
-    goverlay
+    mangohud
+    protonup-qt
     vulkan-tools
     gnome-disk-utility
-    # Added for Gamescope compatibility
-    vulkan-loader
-    vulkan-validation-layers
-    libglvnd
+    # Fix: cpupower is inside the kernel packages
+    linuxPackages_zen.cpupower
   ];
 
+  # OBS Studio (Blackwell/NVENC Optimized)
   programs.obs-studio = {
     enable = true;
     package = pkgs.obs-studio.override {

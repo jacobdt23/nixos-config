@@ -3,18 +3,22 @@
 {
   services.xserver.videoDrivers = [ "nvidia" ];
 
-  boot.kernelParams = [
-    "nvidia-drm.modeset=1"
-    "nvidia-drm.fbdev=1" # Essential for Gamescope on KDE Wayland
-    "nvidia.NVreg_EnableGpuFirmware=0"
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1" # Prevents crashes on launch
+  # Zen kernel for superior frame pacing on the 7800X3D
+  boot.kernelPackages = pkgs.linuxPackages_zen;
+
+  boot.kernelParams = [ 
+    "nvidia-drm.modeset=1" 
+    "nvidia-drm.fbdev=1" 
+    "nvidia.NVreg_EnableGpuFirmware=0" 
+    "nvidia.NVreg_RegistryDwords=PerfLevelSrc=0x2222"
   ];
 
   hardware.nvidia = {
-    open = true;
+    open = true; 
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     modesetting.enable = true;
+    powerManagement.enable = false;
   };
 
   hardware.graphics = {
@@ -31,10 +35,6 @@
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    # Helps Gamescope find the NVIDIA driver in the Nix store
-    XDG_SESSION_TYPE = "wayland";
-    NVD_BACKEND = "direct";
+    __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json";
   };
-
-  boot.kernelPackages = pkgs.linuxPackages_6_18;
 }
