@@ -3,22 +3,22 @@
 {
   services.xserver.videoDrivers = [ "nvidia" ];
 
-  # Zen kernel for superior frame pacing on the 7800X3D
   boot.kernelPackages = pkgs.linuxPackages_zen;
 
-  boot.kernelParams = [ 
-    "nvidia-drm.modeset=1" 
-    "nvidia-drm.fbdev=1" 
-    "nvidia.NVreg_EnableGpuFirmware=0" 
-    "nvidia.NVreg_RegistryDwords=PerfLevelSrc=0x2222"
+  boot.kernelParams = [
+    "nvidia-drm.modeset=1"
+    "nvidia-drm.fbdev=1"
+    "nvidia.NVreg_EnableGpuFirmware=0"
+    # PERFORMANCE LOCK: Prevents the 5070 from downclocking mid-game (Blackwell stutter fix)
+    "nvidia.NVreg_RegistryDwords=PerfLevelSrc=0x2222;PowerMizerEnable=0x1;PerfLevelSrc=0x3322;PowerMizerDefaultAC=0x1"
   ];
 
   hardware.nvidia = {
-    open = true; 
+    open = true;
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     modesetting.enable = true;
-    powerManagement.enable = false;
+    powerManagement.enable = false; 
   };
 
   hardware.graphics = {
@@ -36,5 +36,7 @@
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     __EGL_VENDOR_LIBRARY_FILENAMES = "/run/opengl-driver/share/glvnd/egl_vendor.d/10_nvidia.json";
+    # Wayland Fix: Prevents KWin/NVIDIA sync issues that cause micro-stutters
+    KWIN_DRM_USE_MODIFIERS = "0"; 
   };
 }
