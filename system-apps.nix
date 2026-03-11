@@ -14,7 +14,7 @@
     vulkan-tools
     gnome-disk-utility
     linuxPackages_zen.cpupower # Direct reference for your Zen kernel
-    
+
     # Standard Apps
     brave
     neovide
