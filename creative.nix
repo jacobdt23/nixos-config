@@ -26,7 +26,7 @@ in
   ];
 
   environment.sessionVariables = {
-    ALSA_CARD = "Generic"; 
+    ALSA_CARD = "Generic";
     LD_LIBRARY_PATH = [ "${pkgs.libpulseaudio}/lib" ];
   };
 }

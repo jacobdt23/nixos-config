@@ -4,6 +4,11 @@
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.cudaSupport = true;
 
+  # Permitting Ventoy as it is currently marked insecure in nixpkgs
+  nixpkgs.config.permittedInsecurePackages = [
+    "ventoy-1.1.10"
+  ];
+
   programs.gamemode.enable = true;
 
   environment.systemPackages = with pkgs; [
@@ -25,6 +30,7 @@
     discord
     wget
     curl
+    ventoy
   ];
 
   programs.obs-studio = {
