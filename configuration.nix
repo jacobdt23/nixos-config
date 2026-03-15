@@ -38,19 +38,18 @@
     options = "--delete-older-than 7d";
   };
 
-  # --- Bootloader ---
+  # --- Bootloader (Windows Recovery Mode) ---
   boot.loader.grub = {
     enable = true;
     device = "nodev";
     efiSupport = true;
-    useOSProber = false;
+    useOSProber = true; # Finds Windows on nvme1n1
     configurationLimit = 10;
   };
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.timeout = 1;
   systemd.network.wait-online.enable = false;
 
-  # --- Storage & Kernel Tweaks ---
   boot.kernel.sysctl = {
     "vm.max_map_count" = 2147483642; # Hogwarts Legacy fix
     "vm.swappiness" = 10; # Prefer RAM over swap
@@ -61,6 +60,9 @@
   networking.networkmanager.enable = true;
   time.timeZone = "America/Indiana/Indianapolis";
   i18n.defaultLocale = "en_US.UTF-8";
+
+  # Dual-Boot Fix: Keep Windows and Linux clocks in sync
+  time.hardwareClockInLocalTime = true;
 
   # --- Primary Desktop (KDE Plasma 6) ---
   services.xserver.enable = true;
