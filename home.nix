@@ -34,10 +34,27 @@ in
     symbola
     nerd-fonts.symbols-only
   ];
-
-  home.file = {
-    ".config/neovide/config.toml".text = "fork = true";
-  };
+ 
+home.file.".config/fastfetch/config.jsonc".text = ''
+    {
+      "modules": [
+        "title",
+        "separator",
+        "os",
+        "kernel",
+        "uptime",
+        "packages",
+        "shell",
+        "de",
+        "wm",
+        "cpu",
+        "gpu",
+        "memory",
+        "break",
+        "colors"
+      ]
+    }
+  '';
 
   programs.bash = {
     enable = true;
