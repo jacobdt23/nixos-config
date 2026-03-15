@@ -6,17 +6,16 @@
     ./nvidia.nix
     ./system-apps.nix
     ./creative.nix
-    ./cosmic.nix # Modular Specialisation
   ];
 
   # --- Nix System Management ---
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
-    
+
     # STABILITY: Optimized build intensity for your 32GB RAM
-    max-jobs = 4; 
-    cores = 2;    
+    max-jobs = 4;
+    cores = 2;
 
     substituters = [ "https://cosmic.cachix.org/" ];
     trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
@@ -30,7 +29,7 @@
   zramSwap = {
     enable = true;
     priority = 100;
-    memoryPercent = 50; 
+    memoryPercent = 50;
   };
 
   nix.gc = {
@@ -52,9 +51,9 @@
   systemd.network.wait-online.enable = false;
 
   # --- Storage & Kernel Tweaks ---
-  boot.kernel.sysctl = { 
+  boot.kernel.sysctl = {
     "vm.max_map_count" = 2147483642; # Hogwarts Legacy fix
-    "vm.swappiness" = 10;            # Prefer RAM over swap
+    "vm.swappiness" = 10; # Prefer RAM over swap
   };
 
   # --- Networking & Localization ---
