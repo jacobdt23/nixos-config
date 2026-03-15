@@ -6,14 +6,33 @@
     ./nvidia.nix
     ./system-apps.nix
     ./creative.nix
+    # ./cosmic.nix # Commented out until base system is stable and upstream fixes are in
   ];
 
   # --- Nix System Management ---
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
+    
+    # STABILITY: Prevent RAM spikes on your 32GB system during builds
+    # This keeps the 7800X3D from overwhelming the memory bus
+    max-jobs = 4; 
+    cores = 2;    
+
     substituters = [ "https://cosmic.cachix.org/" ];
     trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
+  };
+
+  # NUCLEAR STABILITY: Disable the aggressive OOM killer "Bouncer"
+  # This stops Brave and Terminal from being killed during high-pressure builds
+  systemd.oomd.enable = false;
+  systemd.oomd.enableUserSlices = false;
+
+  # ENABLE high-priority compressed RAM swap (16GB safety buffer)
+  zramSwap = {
+    enable = true;
+    priority = 100;
+    memoryPercent = 50; 
   };
 
   nix.gc = {
@@ -31,21 +50,14 @@
     configurationLimit = 10;
   };
   boot.loader.efi.canTouchEfiVariables = true;
-
-  # --- Performance Boot Tweaks ---
-  boot.loader.timeout = 1; 
+  boot.loader.timeout = 1;
   systemd.network.wait-online.enable = false;
-  boot.consoleLogLevel = 0;
-  boot.initrd.verbose = false;
 
-  # --- Storage ---
-  fileSystems."/mnt/GAMES" = {
-    device = "/dev/disk/by-uuid/c7cd2f66-a823-4cc7-8f24-b64bed83a67c";
-    fsType = "ext4";
-    options = [ "defaults" "nofail" "user" ];
+  # --- Storage & Kernel Tweaks ---
+  boot.kernel.sysctl = { 
+    "vm.max_map_count" = 2147483642; # Hogwarts Legacy / UE5 fix
+    "vm.swappiness" = 10;            # Prefer RAM over swap for responsiveness
   };
-
-  boot.kernel.sysctl = { "vm.max_map_count" = 2147483642; };
 
   # --- Networking & Localization ---
   networking.hostName = "nixos";
@@ -53,7 +65,7 @@
   time.timeZone = "America/Indiana/Indianapolis";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # --- Primary Desktop Environment (KDE Plasma 6) ---
+  # --- Desktop Environment (KDE Plasma 6) ---
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
@@ -61,32 +73,6 @@
   services.xserver.xkb = {
     layout = "us";
     variant = "";
-  };
-
-  # --- SPECIALISATION: COSMIC DESKTOP ---
-  specialisation."COSMIC".configuration = {
-    system.nixos.tags = [ "COSMIC" ];
-
-    # 1. Disable Plasma 6
-    services.desktopManager.plasma6.enable = lib.mkForce false;
-
-    # 2. Enable COSMIC Core
-    services.desktopManager.cosmic.enable = true;
-    
-    # 3. Use SDDM (KDE Login) to bypass broken greeter
-    services.displayManager.sddm.enable = lib.mkForce true;
-    services.displayManager.cosmic-greeter.enable = lib.mkForce false;
-
-    # 4. EXCLUDE BROKEN PACKAGES 
-    # This prevents Nix from trying to build the apps that have hash mismatches
-    environment.cosmic.excludePackages = with pkgs; [
-      cosmic-edit
-      cosmic-term
-      cosmic-greeter
-    ];
-
-    # NVIDIA Blackwell fix
-    boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
   };
 
   # --- Hardware & Sound ---
@@ -106,6 +92,7 @@
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
   };
 
+  # --- Home Manager Integration ---
   nixpkgs.config.allowUnfree = true;
 
   home-manager = {

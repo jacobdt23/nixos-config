@@ -1,5 +1,19 @@
 { config, pkgs, ... }:
 
+let
+  drs-fix = pkgs.writeShellScriptBin "drs-fix" ''
+    if [ -z "$1" ]; then
+        echo "Usage: drs-fix <filename>"
+        exit 1
+    fi
+    INPUT="$1"
+    FILENAME="''${INPUT%.*}"
+    OUTPUT="''${FILENAME}_DRS.mov"
+    echo "🚀 Making clip Resolve-Ready: $INPUT"
+    ${pkgs.ffmpeg_7-full}/bin/ffmpeg -i "$INPUT" -vcodec copy -acodec pcm_s16le "$OUTPUT"
+    echo "✅ Success! Imported $OUTPUT into Resolve."
+  '';
+in
 {
   home.username = "jacob";
   home.homeDirectory = "/home/jacob";
@@ -8,25 +22,18 @@
   fonts.fontconfig.enable = true;
 
   home.packages = with pkgs; [
-    # Neovim & Support
+    # Neovim & Dev Tools
     lua-language-server
     nil
     stylua
-    ripgrep
     fd
     gcc
     unzip
-
-    # Tech Tools
-    fastfetch
-    pciutils
-    tree
-    nixpkgs-fmt
-
-    # Productivity & Creative
-    kdePackages.kate
     shellcheck
     pandoc
+    
+    # Multimedia
+    drs-fix
     symbola
     nerd-fonts.symbols-only
   ];
@@ -60,55 +67,34 @@
   programs.bash = {
     enable = true;
     initExtra = ''
-      # THE ULTIMATE SMART REBUILD (v5 - Bulletproof Sync)
       function rebuild {
-        git -C ~/nixos-config add .
-        echo -e "\033[1;33m--- Syncing with GitHub ---\033[0m"
-        git -C ~/nixos-config pull --rebase
-
-        local files_changed=$(git -C ~/nixos-config diff --cached --name-only | tr '\n' ' ' | sed 's/ $//')
-        local stats=$(git -C ~/nixos-config diff --cached --shortstat | sed 's/^ //')
-        local gen=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
-        local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
-
-        if [ -z "$files_changed" ]; then
-          local auto_msg="Gen $gen ($timestamp): Routine maintenance"
-        else
-          local auto_msg="Gen $gen ($timestamp): $files_changed | $stats"
+        # Clean up editor saves before committing
+        if ls ~/nixos-config/*.save 1> /dev/null 2>&1; then
+           echo -e "\033[1;31m⚠️  Cleaning .save files...\033[0m"
+           rm ~/nixos-config/*.save
         fi
 
-        local msg="''${1:-$auto_msg}"
+        echo -e "\033[1;33m--- Syncing with GitHub ---\033[0m"
+        git -C ~/nixos-config add .
+        
+        local gen=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
+        local timestamp=$(date +'%Y-%m-%d %H:%M:%S')
+        local msg="''${1:-Gen $gen ($timestamp) Rebuild}"
+        
+        git -C ~/nixos-config commit -m "$msg" || true
+        git -C ~/nixos-config pull --rebase
 
-        echo -e "\033[1;34m--- Preparing NixOS Configs ($timestamp) ---\033[0m"
+        echo -e "\033[1;34m--- Building NixOS Gen $((gen+1)) ---\033[0m"
         nixpkgs-fmt ~/nixos-config/*.nix
 
-        if sudo nixos-rebuild switch --flake ~/nixos-config#nixos; then
-          git -C ~/nixos-config commit -m "$msg"
+        if sudo nixos-rebuild switch --flake ~/nixos-config#nixos --impure; then
           git -C ~/nixos-config push
-          echo -e "\n\033[1;32m🚀 Update complete: $msg\033[0m\n"
+          echo -e "\n\033[1;32m🚀 Update complete!\033[0m\n"
         else
-          echo -e "\n\033[1;31m❌ Rebuild failed. No push to GitHub.\033[0m\n"
+          echo -e "\n\033[1;31m❌ Rebuild failed.\033[0m\n"
           return 1
         fi
       }
-
-      # THE MAINTENANCE ENGINE (v1 - Deep Clean & Optimize)
-      function maintenance {
-        echo -e "\033[1;35m--- Starting Deep System Maintenance ---\033[0m"
-        echo -e "\033[1;34mUpdating Flake inputs...\033[0m"
-        nix flake update --flake ~/nixos-config
-        
-        rebuild "chore: weekly maintenance and flake update"
-
-        echo -e "\033[1;33mCollecting Garbage...\033[0m"
-        sudo nix-collect-garbage --delete-older-than 7d
-        
-        echo -e "\033[1;32mOptimising Nix Store...\033[0m"
-        nix-store --optimise
-
-        echo -e "\033[1;36m✨ Maintenance Complete! System is Golden. ✨\033[0m"
-      }
-
       showcase
     '';
 
