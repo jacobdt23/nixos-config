@@ -26,9 +26,9 @@
   # --- Bootloader ---
   boot.loader.grub = {
     enable = true;
-    device = "nodev";
+    device = "nodev"; 
     efiSupport = true;
-    useOSProber = false;
+    useOSProber = false; 
     configurationLimit = 10;
   };
   boot.loader.efi.canTouchEfiVariables = true;
@@ -40,7 +40,7 @@
   boot.initrd.verbose = false;
 
   # --- Storage ---
-  # Mounting your 2TB Samsung 990 PRO
+  # Mounting your 2TB Samsung 990 PRO to /mnt/GAMES
   fileSystems."/mnt/GAMES" = {
     device = "/dev/disk/by-uuid/c7cd2f66-a823-4cc7-8f24-b64bed83a67c";
     fsType = "ext4";
@@ -68,17 +68,20 @@
   };
 
   # --- SPECIALISATION: COSMIC DESKTOP ---
-  # This creates a separate entry in your GRUB menu
+  # This creates a separate entry in your GRUB menu.
+  # Using SDDM bypass to avoid the broken cosmic-greeter hash mismatch.
   specialisation."COSMIC".configuration = {
     system.nixos.tags = [ "COSMIC" ];
 
-    # Disable Plasma 6 and SDDM for this specialisation
+    # 1. Disable Plasma 6
     services.desktopManager.plasma6.enable = lib.mkForce false;
-    services.displayManager.sddm.enable = lib.mkForce false;
 
-    # Enable COSMIC Desktop (Epoch 1 Stable)
+    # 2. Keep SDDM enabled as the login manager
+    services.displayManager.sddm.enable = lib.mkForce true;
+
+    # 3. Enable COSMIC Desktop (But DISABLE the broken greeter)
     services.desktopManager.cosmic.enable = true;
-    services.displayManager.cosmic-greeter.enable = true;
+    services.displayManager.cosmic-greeter.enable = lib.mkForce false;
 
     # NVIDIA Blackwell fix specific to the COSMIC compositor
     boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
@@ -108,7 +111,7 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     users.jacob = import ./home.nix;
-    # Pass the inputs to home-manager so it can use nix-gaming if needed
+    # Pass the inputs to home-manager so it can use flake inputs
     extraSpecialArgs = { inherit inputs; };
   };
 
