@@ -12,7 +12,6 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
-    # Binary Cache for COSMIC (Prevents Rust compilation hell)
     substituters = [ "https://cosmic.cachix.org/" ];
     trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
   };
@@ -46,7 +45,6 @@
     options = [ "defaults" "nofail" "user" ];
   };
 
-  # Optimized for 7800X3D & Hogwarts Legacy
   boot.kernel.sysctl = { "vm.max_map_count" = 2147483642; };
 
   # --- Networking & Localization ---
@@ -75,14 +73,19 @@
     # 2. Enable COSMIC Core
     services.desktopManager.cosmic.enable = true;
     
-    # 3. Disable broken components using full option paths
-    services.displayManager.cosmic-greeter.enable = lib.mkForce false;
-    services.desktopManager.cosmic.app-library.enable = lib.mkForce false; 
-
-    # 4. Keep SDDM enabled for login
+    # 3. Use SDDM (KDE Login) to bypass broken greeter
     services.displayManager.sddm.enable = lib.mkForce true;
+    services.displayManager.cosmic-greeter.enable = lib.mkForce false;
 
-    # NVIDIA Blackwell fix for the COSMIC compositor
+    # 4. EXCLUDE BROKEN PACKAGES 
+    # This prevents Nix from trying to build the apps that have hash mismatches
+    environment.cosmic.excludePackages = with pkgs; [
+      cosmic-edit
+      cosmic-term
+      cosmic-greeter
+    ];
+
+    # NVIDIA Blackwell fix
     boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
   };
 
@@ -103,7 +106,6 @@
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
   };
 
-  # --- Global App & Home Manager Settings ---
   nixpkgs.config.allowUnfree = true;
 
   home-manager = {
