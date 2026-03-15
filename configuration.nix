@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 {
   imports = [
@@ -12,6 +12,9 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
+    # Binary Cache for COSMIC (Critical to avoid hours of Rust compilation)
+    substituters = [ "https://cosmic.cachix.org/" ];
+    trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
   };
 
   nix.gc = {
@@ -23,35 +26,28 @@
   # --- Bootloader ---
   boot.loader.grub = {
     enable = true;
-    device = "nodev"; # "nodev" is correct for EFI systems
+    device = "nodev";
     efiSupport = true;
-    useOSProber = false; # Cleaned up PikaOS entries
+    useOSProber = false;
     configurationLimit = 10;
   };
-
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # 1. Kill the GRUB wait (Standard is usually 5s or more)
-  boot.loader.timeout = 1;
-
-  # 2. Parallelize the remaining network bits
-  systemd.network.wait-online.enable = false;
-
-  # 3. Clean up the Kernel Console (Optional)
-  # This stops the text "scrolling" which can sometimes slightly slow the transition to SDDM
+  # --- Performance Boot Tweaks ---
+  boot.loader.timeout = 1; # Kill the GRUB wait
+  systemd.network.wait-online.enable = false; # Parallelize network start
   boot.consoleLogLevel = 0;
   boot.initrd.verbose = false;
 
-
   # --- Storage ---
-  # This mounts your 2TB Samsung 990 PRO to /mnt/GAMES
+  # Mounting your 2TB Samsung 990 PRO
   fileSystems."/mnt/GAMES" = {
     device = "/dev/disk/by-uuid/c7cd2f66-a823-4cc7-8f24-b64bed83a67c";
     fsType = "ext4";
     options = [ "defaults" "nofail" "user" ];
   };
 
-  # Fix for Hogwarts Legacy map/freezing
+  # Optimized for 7800X3D & Heavy Games (Hogwarts Legacy Fix)
   boot.kernel.sysctl = { "vm.max_map_count" = 2147483642; };
 
   # --- Networking & Localization ---
@@ -60,7 +56,7 @@
   time.timeZone = "America/Indiana/Indianapolis";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # --- Desktop Environment (KDE Plasma 6) ---
+  # --- Primary Desktop Environment (KDE Plasma 6) ---
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
@@ -69,6 +65,23 @@
   services.xserver.xkb = {
     layout = "us";
     variant = "";
+  };
+
+  # --- SPECIALISATION: COSMIC DESKTOP ---
+  # This creates a separate entry in your GRUB menu
+  specialisation."COSMIC".configuration = {
+    system.nixos.tags = [ "COSMIC" ];
+
+    # Disable Plasma 6 and SDDM for this specialisation
+    services.desktopManager.plasma6.enable = lib.mkForce false;
+    services.displayManager.sddm.enable = lib.mkForce false;
+
+    # Enable COSMIC Desktop (Epoch 1 Stable)
+    services.desktopManager.cosmic.enable = true;
+    services.displayManager.cosmic-greeter.enable = true;
+
+    # NVIDIA Blackwell fix specific to the COSMIC compositor
+    boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
   };
 
   # --- Hardware & Sound ---
@@ -88,22 +101,16 @@
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
   };
 
-  # --- Steam Configuration ---
-  programs.steam = {
-    enable = true;
-    # This allows Steam to see and use the /mnt/GAMES drive
-    extest.enable = true;
-    remotePlay.openFirewall = true;
-    dedicatedServer.openFirewall = true;
-  };
-
-  # --- Global App Settings ---
+  # --- Global App & Home Manager Settings ---
   nixpkgs.config.allowUnfree = true;
 
-  # Home Manager Integration
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.users.jacob = import ./home.nix;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.jacob = import ./home.nix;
+    # Pass the inputs to home-manager so it can use nix-gaming if needed
+    extraSpecialArgs = { inherit inputs; };
+  };
 
   system.stateVersion = "25.11";
 }
