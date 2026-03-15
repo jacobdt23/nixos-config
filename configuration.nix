@@ -12,7 +12,7 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
-    # Binary Cache for COSMIC (Critical to avoid hours of Rust compilation)
+    # Binary Cache for COSMIC (Avoids massive Rust compile times)
     substituters = [ "https://cosmic.cachix.org/" ];
     trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
   };
@@ -26,28 +26,27 @@
   # --- Bootloader ---
   boot.loader.grub = {
     enable = true;
-    device = "nodev"; 
+    device = "nodev";
     efiSupport = true;
-    useOSProber = false; 
+    useOSProber = false;
     configurationLimit = 10;
   };
   boot.loader.efi.canTouchEfiVariables = true;
 
   # --- Performance Boot Tweaks ---
-  boot.loader.timeout = 1; # Kill the GRUB wait
-  systemd.network.wait-online.enable = false; # Parallelize network start
+  boot.loader.timeout = 1; 
+  systemd.network.wait-online.enable = false;
   boot.consoleLogLevel = 0;
   boot.initrd.verbose = false;
 
   # --- Storage ---
-  # Mounting your 2TB Samsung 990 PRO to /mnt/GAMES
   fileSystems."/mnt/GAMES" = {
     device = "/dev/disk/by-uuid/c7cd2f66-a823-4cc7-8f24-b64bed83a67c";
     fsType = "ext4";
     options = [ "defaults" "nofail" "user" ];
   };
 
-  # Optimized for 7800X3D & Heavy Games (Hogwarts Legacy Fix)
+  # Optimized for 7800X3D & Heavy Games
   boot.kernel.sysctl = { "vm.max_map_count" = 2147483642; };
 
   # --- Networking & Localization ---
@@ -61,29 +60,28 @@
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
-  # Set US Keymap
   services.xserver.xkb = {
     layout = "us";
     variant = "";
   };
 
   # --- SPECIALISATION: COSMIC DESKTOP ---
-  # This creates a separate entry in your GRUB menu.
-  # Using SDDM bypass to avoid the broken cosmic-greeter hash mismatch.
+  # Using SDDM bypass and core-only install to avoid hash mismatches
   specialisation."COSMIC".configuration = {
     system.nixos.tags = [ "COSMIC" ];
 
-    # 1. Disable Plasma 6
+    # Disable Plasma 6 for this boot entry
     services.desktopManager.plasma6.enable = lib.mkForce false;
 
-    # 2. Keep SDDM enabled as the login manager
+    # Enable COSMIC Core
+    services.desktopManager.cosmic.enable = true;
+    
+    # Disable the experimental/broken COSMIC apps and greeter
+    services.displayManager.cosmic-greeter.enable = lib.mkForce false;
+    # Use standard SDDM instead
     services.displayManager.sddm.enable = lib.mkForce true;
 
-    # 3. Enable COSMIC Desktop (But DISABLE the broken greeter)
-    services.desktopManager.cosmic.enable = true;
-    services.displayManager.cosmic-greeter.enable = lib.mkForce false;
-
-    # NVIDIA Blackwell fix specific to the COSMIC compositor
+    # NVIDIA Blackwell fix for cosmic-comp
     boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
   };
 
@@ -111,7 +109,6 @@
     useGlobalPkgs = true;
     useUserPackages = true;
     users.jacob = import ./home.nix;
-    # Pass the inputs to home-manager so it can use flake inputs
     extraSpecialArgs = { inherit inputs; };
   };
 
