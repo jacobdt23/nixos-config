@@ -6,7 +6,7 @@
     ./nvidia.nix
     ./system-apps.nix
     ./creative.nix
-    # ./cosmic.nix # Commented out until base system is stable and upstream fixes are in
+    ./cosmic.nix # Modular Specialisation
   ];
 
   # --- Nix System Management ---
@@ -14,8 +14,7 @@
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
     
-    # STABILITY: Prevent RAM spikes on your 32GB system during builds
-    # This keeps the 7800X3D from overwhelming the memory bus
+    # STABILITY: Optimized build intensity for your 32GB RAM
     max-jobs = 4; 
     cores = 2;    
 
@@ -24,7 +23,6 @@
   };
 
   # NUCLEAR STABILITY: Disable the aggressive OOM killer "Bouncer"
-  # This stops Brave and Terminal from being killed during high-pressure builds
   systemd.oomd.enable = false;
   systemd.oomd.enableUserSlices = false;
 
@@ -55,8 +53,8 @@
 
   # --- Storage & Kernel Tweaks ---
   boot.kernel.sysctl = { 
-    "vm.max_map_count" = 2147483642; # Hogwarts Legacy / UE5 fix
-    "vm.swappiness" = 10;            # Prefer RAM over swap for responsiveness
+    "vm.max_map_count" = 2147483642; # Hogwarts Legacy fix
+    "vm.swappiness" = 10;            # Prefer RAM over swap
   };
 
   # --- Networking & Localization ---
@@ -65,7 +63,7 @@
   time.timeZone = "America/Indiana/Indianapolis";
   i18n.defaultLocale = "en_US.UTF-8";
 
-  # --- Desktop Environment (KDE Plasma 6) ---
+  # --- Primary Desktop (KDE Plasma 6) ---
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
@@ -76,7 +74,6 @@
   };
 
   # --- Hardware & Sound ---
-  services.printing.enable = true;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -91,9 +88,6 @@
     description = "jacob";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
   };
-
-  # --- Home Manager Integration ---
-  nixpkgs.config.allowUnfree = true;
 
   home-manager = {
     useGlobalPkgs = true;

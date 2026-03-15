@@ -17,7 +17,7 @@
     pciutils
     fastfetch
     tree
-    
+
     # Tech Apps
     brave
     discord
@@ -32,7 +32,7 @@
     protonup-qt
     vulkan-tools
     gnome-disk-utility
-    
+
     # System Tools
     linuxPackages_zen.cpupower
   ];
