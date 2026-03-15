@@ -12,7 +12,7 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
-    # Binary Cache for COSMIC (Avoids massive Rust compile times)
+    # Binary Cache for COSMIC (Prevents Rust compilation hell)
     substituters = [ "https://cosmic.cachix.org/" ];
     trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
   };
@@ -46,7 +46,7 @@
     options = [ "defaults" "nofail" "user" ];
   };
 
-  # Optimized for 7800X3D & Heavy Games
+  # Optimized for 7800X3D & Hogwarts Legacy
   boot.kernel.sysctl = { "vm.max_map_count" = 2147483642; };
 
   # --- Networking & Localization ---
@@ -66,22 +66,24 @@
   };
 
   # --- SPECIALISATION: COSMIC DESKTOP ---
-  # Using SDDM bypass and core-only install to avoid hash mismatches
   specialisation."COSMIC".configuration = {
     system.nixos.tags = [ "COSMIC" ];
 
-    # Disable Plasma 6 for this boot entry
+    # 1. Disable Plasma 6
     services.desktopManager.plasma6.enable = lib.mkForce false;
 
-    # Enable COSMIC Core
+    # 2. Enable COSMIC Core
     services.desktopManager.cosmic.enable = true;
     
-    # Disable the experimental/broken COSMIC apps and greeter
+    # 3. Disable broken/unstable components
     services.displayManager.cosmic-greeter.enable = lib.mkForce false;
-    # Use standard SDDM instead
+    # Prevent Nix from building the buggy Rust app suite
+    cosmic.app-library.enable = lib.mkForce false; 
+
+    # 4. Use SDDM (KDE Login) as the bridge
     services.displayManager.sddm.enable = lib.mkForce true;
 
-    # NVIDIA Blackwell fix for cosmic-comp
+    # NVIDIA Blackwell fix for the COSMIC compositor
     boot.kernelParams = [ "nvidia_drm.fbdev=1" ];
   };
 
