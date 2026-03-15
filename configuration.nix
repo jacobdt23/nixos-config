@@ -75,12 +75,11 @@
     # 2. Enable COSMIC Core
     services.desktopManager.cosmic.enable = true;
     
-    # 3. Disable broken/unstable components
+    # 3. Disable broken components using full option paths
     services.displayManager.cosmic-greeter.enable = lib.mkForce false;
-    # Prevent Nix from building the buggy Rust app suite
-    cosmic.app-library.enable = lib.mkForce false; 
+    services.desktopManager.cosmic.app-library.enable = lib.mkForce false; 
 
-    # 4. Use SDDM (KDE Login) as the bridge
+    # 4. Keep SDDM enabled for login
     services.displayManager.sddm.enable = lib.mkForce true;
 
     # NVIDIA Blackwell fix for the COSMIC compositor
