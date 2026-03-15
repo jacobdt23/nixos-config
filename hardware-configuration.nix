@@ -27,11 +27,11 @@
       options = [ "fmask=0077" "dmask=0077" ];
     };
 
-#  fileSystems."/mnt/GAMES" =
-#   {
-#    device = "/dev/disk/by-uuid/c7cd2f66-a823-4cc7-8f24-b64bed83a67c";
-#   fsType = "ext4";
- # };
+  #  fileSystems."/mnt/GAMES" =
+  #   {
+  #    device = "/dev/disk/by-uuid/c7cd2f66-a823-4cc7-8f24-b64bed83a67c";
+  #   fsType = "ext4";
+  # };
 
   swapDevices = [ ];
 

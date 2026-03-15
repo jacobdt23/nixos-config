@@ -34,8 +34,8 @@ in
     symbola
     nerd-fonts.symbols-only
   ];
- 
-home.file.".config/fastfetch/config.jsonc".text = ''
+
+  home.file.".config/fastfetch/config.jsonc".text = ''
     {
       "modules": [
         "title",
