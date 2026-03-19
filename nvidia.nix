@@ -2,12 +2,11 @@
 
 {
   services.xserver.videoDrivers = [ "nvidia" ];
-  boot.kernelPackages = pkgs.linuxPackages_zen;
 
   hardware.nvidia = {
-    open = true; # Blackwell (50-series) requirement for best Wayland support
     modesetting.enable = true;
-    powerManagement.enable = false; # Prevents sleep-wake flicker on multi-monitor
+    open = true; # REQUIRED for RTX 50-series/Blackwell
+    powerManagement.enable = false; # Prevents flicker on dual LG monitors
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
 
@@ -17,9 +16,11 @@
     extraPackages = with pkgs; [ nvidia-vaapi-driver ];
   };
 
+  # Forces Plasma and Electron apps to use Wayland/Nvidia correctly
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+    NIXOS_OZONE_WL = "1"; # Critical for Brave/Discord/Electron on Wayland
   };
 }

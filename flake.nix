@@ -21,9 +21,9 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
-          ./hardware-configuration.nix
-          ./nvidia.nix      # Hardware specific
-          ./creative.nix    # Resolve Studio (GPU dependent)
+          ./hardware-configuration.nix 
+          ./nvidia.nix      
+          ./creative.nix    
           nixos-cosmic.nixosModules.default
           home-manager.nixosModules.home-manager
         ];
@@ -38,10 +38,9 @@
           ./hardware-configuration.nix
           nixos-cosmic.nixosModules.default
           home-manager.nixosModules.home-manager
-          ({ pkgs, ... }: {
-            # Forces Hyper-V guest services for the VM build
-            virtualisation.hypervGuest.enable = true;
+          ({ lib, ... }: {
             networking.hostName = "nixos-vm";
+            virtualisation.hypervGuest.enable = true;
           })
         ];
       };
