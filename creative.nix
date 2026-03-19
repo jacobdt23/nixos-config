@@ -7,19 +7,19 @@ let
         exit 1
     fi
     INPUT="$1"
-    FILENAME="''${INPUT%.*}"
-    OUTPUT="''${FILENAME}_DRS.mov"
+    # Use ''${ to tell Nix "this is a literal string, not a Nix variable"
+    FILENAME=''${INPUT%.*}
+    OUTPUT=''${FILENAME}_DRS.mov
+    
     echo "🚀 Making clip Resolve-Ready: $INPUT"
     ${pkgs.ffmpeg_7-full}/bin/ffmpeg -i "$INPUT" -vcodec copy -acodec pcm_s16le "$OUTPUT"
     echo "✅ Success! Imported $OUTPUT into Resolve."
   '';
 in
 {
-  nixpkgs.config.allowUnfree = true;
-
+  # ... rest of your creative.nix
   environment.systemPackages = with pkgs; [
-    davinci-resolve
-    obs-studio
+    davinci-resolve-studio
     vlc
     ffmpeg_7-full
     drs-fix
