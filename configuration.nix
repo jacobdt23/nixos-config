@@ -2,18 +2,19 @@
 
 {
   imports = [
-    ./hardware-configuration.nix
-    ./nvidia.nix
+    # We only import the universal app list here. 
+    # nvidia.nix and creative.nix are now called by flake.nix based on the host.
     ./system-apps.nix
-    ./creative.nix
   ];
 
-  # --- Nix System Management ---
+  # --- Global Nix Settings ---
+  nixpkgs.config.allowUnfree = true;
+  
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
 
-    # STABILITY: Optimized build intensity for your 32GB RAM
+    # Optimized build intensity for your 32GB RAM
     max-jobs = 4;
     cores = 2;
 
@@ -21,38 +22,35 @@
     trusted-public-keys = [ "cosmic.cachix.org-1:Dya9IyXD4xdBehWjrkPv6rtxpmMdRel02smYzA85dPE=" ];
   };
 
-  # NUCLEAR STABILITY: Disable the aggressive OOM killer "Bouncer"
-  systemd.oomd.enable = false;
-  systemd.oomd.enableUserSlices = false;
-
-  # ENABLE high-priority compressed RAM swap (16GB safety buffer)
+  # --- Memory Management (ZRAM) ---
+  # Essential for 4K editing in Resolve on 32GB RAM
   zramSwap = {
     enable = true;
-    priority = 100;
+    algorithm = "zstd";
     memoryPercent = 50;
+    priority = 100;
   };
 
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 7d";
-  };
+  # Fix for the "Device zram0 not found" conflict with systemd-generators
+  systemd.services."systemd-zram-setup@zram0".enable = lib.mkForce false;
 
-  # --- Bootloader (Windows Recovery Mode) ---
+  # --- Bootloader (Dual-Boot Optimization) ---
   boot.loader.grub = {
     enable = true;
     device = "nodev";
     efiSupport = true;
-    useOSProber = true; # Finds Windows on nvme1n1
+    useOSProber = true; # Finds Windows 11 on your other NVMe
     configurationLimit = 10;
   };
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.timeout = 1;
+  
+  # Speed up boot by not waiting for a network that might not be there
   systemd.network.wait-online.enable = false;
 
   boot.kernel.sysctl = {
-    "vm.max_map_count" = 2147483642; # Hogwarts Legacy fix
-    "vm.swappiness" = 10; # Prefer RAM over swap
+    "vm.max_map_count" = 2147483642; # Hogwarts Legacy / Steam fix
+    "vm.swappiness" = 10;           # Prefer RAM over swap
   };
 
   # --- Networking & Localization ---
@@ -60,11 +58,11 @@
   networking.networkmanager.enable = true;
   time.timeZone = "America/Indiana/Indianapolis";
   i18n.defaultLocale = "en_US.UTF-8";
-
-  # Dual-Boot Fix: Keep Windows and Linux clocks in sync
+  
+  # Keeps Windows and Linux clocks in sync across your NVMe drives
   time.hardwareClockInLocalTime = true;
 
-  # --- Primary Desktop (KDE Plasma 6) ---
+  # --- Desktop Environment (KDE Plasma 6) ---
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
@@ -74,7 +72,7 @@
     variant = "";
   };
 
-  # --- Hardware & Sound ---
+  # --- Audio (Pipewire for HyperX Cloud III) ---
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -86,15 +84,23 @@
   # --- User Account ---
   users.users.jacob = {
     isNormalUser = true;
-    description = "jacob";
+    description = "Jacob Turner";
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
   };
 
+  # --- Home Manager ---
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
     users.jacob = import ./home.nix;
     extraSpecialArgs = { inherit inputs; };
+  };
+
+  # --- Cleanup & Maintenance ---
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 7d";
   };
 
   system.stateVersion = "25.11";
