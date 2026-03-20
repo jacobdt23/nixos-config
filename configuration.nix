@@ -7,8 +7,7 @@
 
   # --- CACHYOS PEAK PERFORMANCE ---
   # Using the specific Zen 4 LTO kernel found in your 'nix flake show'
-  boot.kernelPackages = pkgs.linuxPackages_cachyos-latest-lto-zen4;
-  
+    boot.kernelPackages = pkgs.linuxPackages_cachyos_latest_lto_zen4;
   # Enable Sched-ext (The gaming scheduler)
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd"; # Best for 7800X3D
@@ -42,7 +41,7 @@
 
   networking.hostName = "nixos";
   time.timeZone = "America/Indiana/Indianapolis";
-  
+
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";
