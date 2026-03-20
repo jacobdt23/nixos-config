@@ -10,7 +10,8 @@
   tree
   neovide
   git
-  scx ];
+  scx.full
+ ];
 
   # --- CHRIS TITUS FASTFETCH CONFIG ---
   home.file.".config/fastfetch/config.jsonc".text = ''
