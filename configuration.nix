@@ -6,10 +6,20 @@
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.permittedInsecurePackages = [ "ventoy-1.1.10" ];
 
-  # --- Nix Settings ---
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # --- CACHYOS PERFORMANCE STACK ---
+  boot.kernelPackages = pkgs.linuxPackages_cachyos;
   
-  # --- ZRAM (Fixed for 32GB Rig) ---
+  # Enable Sched-ext (The CachyOS gaming scheduler)
+  services.scx.enable = true;
+  services.scx.scheduler = "scx_lavd"; # Best for Ryzen 7800X3D
+
+  # --- Binary Cache (Avoid compiling the kernel manually) ---
+  nix.settings = {
+    substituters = [ "https://nix-cachyos-kernel.cachix.org" ];
+    trusted-public-keys = [ "nix-cachyos-kernel.cachix.org-1:99NooIAs9V65063g28yE8h4fP3T8vQvO8S6K2m0VfL8=" ];
+  };
+
+  # --- ZRAM (Optimized for 32GB RAM) ---
   zramSwap = {
     enable = true;
     algorithm = "zstd";
@@ -30,16 +40,13 @@
   services.xserver.enable = true;
   services.displayManager.sddm = {
     enable = true;
-    wayland.enable = true; # Forces Wayland to avoid Blackwell X11 crashes
+    wayland.enable = true; 
   };
   services.desktopManager.plasma6.enable = true;
 
-  # --- Networking & Localization ---
   networking.hostName = "nixos";
-  networking.networkmanager.enable = true;
   time.timeZone = "America/Indiana/Indianapolis";
-  i18n.defaultLocale = "en_US.UTF-8";
-
+  
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";
