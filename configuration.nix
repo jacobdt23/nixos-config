@@ -6,27 +6,27 @@
   nixpkgs.config.allowUnfree = true;
 
   # --- CACHYOS ZEN 4 PERFORMANCE ---
-  # Using the direct path from inputs to bypass attribute errors
-  boot.kernelPackages = pkgs.linuxPackagesFor inputs.nix-cachyos-kernel.packages.${pkgs.system}.linux-cachyos-latest-lto-zen4;
+  # Switching to LTS-Zen4 (Linux 6.18) to fix NVIDIA driver compatibility
+  boot.kernelPackages = pkgs.linuxPackagesFor inputs.nix-cachyos-kernel.packages.${pkgs.system}.linux-cachyos-lts-zen4;
   
-  # Gaming Scheduler for 7800X3D snappiness
+  # Gaming Scheduler
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
 
-  # Binary Cache (Vital for speed)
+  # Binary Cache (Vital to avoid local compilation)
   nix.settings = {
     substituters = [ "https://nix-cachyos-kernel.cachix.org" ];
     trusted-public-keys = [ "nix-cachyos-kernel.cachix.org-1:99NooIAs9V65063g28yE8h4fP3T8vQvO8S6K2m0VfL8=" ];
   };
 
-  # --- ZRAM (16GB Swap for 32GB RAM) ---
+  # --- ZRAM (16GB Swap) ---
   zramSwap = {
     enable = true;
     algorithm = "zstd";
     memoryPercent = 50;
   };
 
-  # --- Standard System Logic ---
+  # --- System Logic ---
   boot.loader.grub = {
     enable = true;
     device = "nodev";
@@ -37,7 +37,6 @@
 
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
   services.desktopManager.plasma6.enable = true;
 
   networking.hostName = "nixos";

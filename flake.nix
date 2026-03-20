@@ -9,7 +9,7 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    
     nixos-cosmic = {
       url = "github:lilyinstarlight/nixos-cosmic";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,7 +21,7 @@
       system = "x86_64-linux";
       specialArgs = { inherit inputs; };
       modules = [
-        # Apply the Overlay so pkgs.linux-cachyos-... is available
+        # Apply the Overlay
         ({ ... }: {
           nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.default ];
         })
