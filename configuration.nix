@@ -8,7 +8,7 @@
 
   # --- CACHYOS PERFORMANCE STACK ---
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
-  
+
   # Enable Sched-ext (The CachyOS gaming scheduler)
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd"; # Best for Ryzen 7800X3D
@@ -40,13 +40,13 @@
   services.xserver.enable = true;
   services.displayManager.sddm = {
     enable = true;
-    wayland.enable = true; 
+    wayland.enable = true;
   };
   services.desktopManager.plasma6.enable = true;
 
   networking.hostName = "nixos";
   time.timeZone = "America/Indiana/Indianapolis";
-  
+
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";

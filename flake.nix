@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    
+
     # CachyOS Kernel for NixOS (2026 Standard)
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel";
 
@@ -11,7 +11,7 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
+
     nixos-cosmic = {
       url = "github:lilyinstarlight/nixos-cosmic";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -23,7 +23,7 @@
       system = "x86_64-linux";
       specialArgs = { inherit inputs; };
       modules = [
-        nix-cachyos-kernel.nixosModules.default
+        inputs.nix-cachyos-kernel.nixosModules.nix-cachyos-kernel
         ./configuration.nix
         ./hardware-configuration.nix
         ./nvidia.nix

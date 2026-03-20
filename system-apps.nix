@@ -4,12 +4,24 @@
   nixpkgs.config.cudaSupport = lib.elem "nvidia" config.services.xserver.videoDrivers;
 
   environment.systemPackages = with pkgs; [
-    (if lib.elem "nvidia" config.services.xserver.videoDrivers 
-     then nvtopPackages.full 
-     else nvtopPackages.amd)
+    (if lib.elem "nvidia" config.services.xserver.videoDrivers
+    then nvtopPackages.full
+    else nvtopPackages.amd)
 
-    mangohud fastfetch tree brave discord git neovide nixpkgs-fmt
-    kdePackages.kate github-desktop wget curl ventoy protonup-qt
+    mangohud
+    fastfetch
+    tree
+    brave
+    discord
+    git
+    neovide
+    nixpkgs-fmt
+    kdePackages.kate
+    github-desktop
+    wget
+    curl
+    ventoy
+    protonup-qt
   ];
 
   programs.obs-studio = {
