@@ -7,7 +7,7 @@
 
   # --- CACHYOS PERFORMANCE STACK ---
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
-  
+
   # Sched-ext (Gaming scheduler for 7800X3D)
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
@@ -41,7 +41,7 @@
 
   networking.hostName = "nixos";
   time.timeZone = "America/Indiana/Indianapolis";
-  
+
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";

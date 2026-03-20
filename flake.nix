@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    
+
     # CachyOS Kernel for NixOS
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel";
 
@@ -11,7 +11,7 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    
+
     nixos-cosmic = {
       url = "github:lilyinstarlight/nixos-cosmic";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -24,7 +24,7 @@
       specialArgs = { inherit inputs; };
       modules = [
         # FIXED ATTRIBUTE NAME HERE
-        inputs.nix-cachyos-kernel.nixosModules.cachyos-kernel
+         inputs.nix-cachyos-kernel.nixosModule 
         ./configuration.nix
         ./hardware-configuration.nix
         ./nvidia.nix
