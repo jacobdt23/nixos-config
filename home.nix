@@ -13,10 +13,10 @@ in
   home.stateVersion = "25.11";
 
   # Packages for your playground
-  home.packages = with pkgs; [ 
-    fastfetch 
-    tree 
-    neovide 
+  home.packages = with pkgs; [
+    fastfetch
+    tree
+    neovide
     drs-fix
     git
     pciutils # Useful for checking that RTX 5070 status
@@ -77,7 +77,7 @@ in
       # Launch the fancy fastfetch on startup
       if [[ $- == *i* ]]; then fastfetch; fi
     '';
-    
+
     shellAliases = {
       l = "ls -alh";
       c = "clear";

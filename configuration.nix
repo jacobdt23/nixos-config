@@ -7,7 +7,7 @@
 
   # --- CACHYOS PERFORMANCE STACK ---
   boot.kernelPackages = pkgs.linuxPackages_cachyos;
-  
+
   # Sched-ext (The "secret sauce" for 7800X3D gaming)
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
