@@ -5,7 +5,12 @@
   home.homeDirectory = "/home/jacob";
   home.stateVersion = "25.11";
 
-  home.packages = with pkgs; [ fastfetch tree neovide git ];
+  home.packages = with pkgs; [ 
+  fastfetch 
+  tree
+  neovide
+  git
+  scx ];
 
   # --- CHRIS TITUS FASTFETCH CONFIG ---
   home.file.".config/fastfetch/config.jsonc".text = ''
@@ -43,7 +48,7 @@
         { "type": "media", "key": "│ └󰝚", "keyColor": "magenta" },
         {
           "type": "custom",
-          "format": "\\u001b[90m  \\u001b[31m  \\u001b[32m  \\u001b[33m  \\u001b[34m  \\u001b[35m  \\u001b[36m  \\u001b[37m  \\u001b[38m  \\u001b[39m  \\u001b[39m    \\u001b[38m  \\u001b[37m  \\u001b[36m  \\u001b[35m  \\u001b[34m  \\u001b[33m  \\u001b[32m  \\u001b[31m  \\u001b[90m "
+          "format": " \u001b[90m  \u001b[31m  \u001b[32m  \u001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m  \u001b[38m  \u001b[39m  \u001b[39m    \u001b[38m  \u001b[37m  \u001b[36m  \u001b[35m  \u001b[34m  \u001b[33m  \u001b[32m  \u001b[31m  \u001b[90m "
         },
         "break"
       ]

@@ -8,7 +8,7 @@
   # --- CACHYOS ZEN 4 PERFORMANCE ---
   # Switching to LTS-Zen4 (Linux 6.18) to fix NVIDIA driver compatibility
   boot.kernelPackages = pkgs.linuxPackagesFor inputs.nix-cachyos-kernel.packages.${pkgs.system}.linux-cachyos-lts-zen4;
-  
+
   # Gaming Scheduler
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
@@ -41,7 +41,7 @@
 
   networking.hostName = "nixos";
   time.timeZone = "America/Indiana/Indianapolis";
-  
+
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";
