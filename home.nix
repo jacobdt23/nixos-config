@@ -1,26 +1,11 @@
 { config, pkgs, ... }:
 
-let
-  # Your custom script for processing DaVinci Resolve footage
-  drs-fix = pkgs.writeShellScriptBin "drs-fix" ''
-    if [ -z "$1" ]; then echo "Usage: drs-fix <filename>"; exit 1; fi
-    ${pkgs.ffmpeg_7-full}/bin/ffmpeg -i "$1" -vcodec copy -acodec pcm_s16le "''${1%.*}_DRS.mov"
-  '';
-in
 {
   home.username = "jacob";
   home.homeDirectory = "/home/jacob";
   home.stateVersion = "25.11";
 
-  # Packages for your playground
-  home.packages = with pkgs; [
-    fastfetch
-    tree
-    neovide
-    drs-fix
-    git
-    pciutils # Useful for checking that RTX 5070 status
-  ];
+  home.packages = with pkgs; [ fastfetch tree neovide git ];
 
   # --- CHRIS TITUS FASTFETCH CONFIG ---
   home.file.".config/fastfetch/config.jsonc".text = ''
@@ -65,7 +50,6 @@ in
     }
   '';
 
-  # --- BASH CONFIG & REBUILD ALIAS ---
   programs.bash = {
     enable = true;
     initExtra = ''
@@ -74,26 +58,8 @@ in
         git -C ~/nixos-config commit -m "Rebuild: $(date)" || true
         sudo nixos-rebuild switch --flake ~/nixos-config#nixos --impure
       }
-      # Launch the fancy fastfetch on startup
       if [[ $- == *i* ]]; then fastfetch; fi
     '';
-
-    shellAliases = {
-      l = "ls -alh";
-      c = "clear";
-      health = "nvidia-smi && echo '' && zramctl";
-    };
-  };
-
-  # --- GIT CONFIG ---
-  programs.git = {
-    enable = true;
-    userName = "jacobdt23";
-    userEmail = "turnerjac01@gmail.com";
-    extraConfig = {
-      init.defaultBranch = "main";
-      safe.directory = "/home/jacob/nixos-config";
-    };
   };
 
   programs.home-manager.enable = true;
