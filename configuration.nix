@@ -7,8 +7,8 @@
 
   # --- CACHYOS ZEN 4 PERFORMANCE ---
   # Wrapping the specific Zen 4 package in linuxPackagesFor
-  boot.kernelPackages = pkgs.linuxPackagesFor pkgs.linux-cachyos-latest-lto-zen4;
-  
+  boot.kernelPackages = pkgs.linuxPackagesFor inputs.nix-cachyos-kernel.packages.${pkgs.system}.linux-cachyos-latest-lto-zen4;
+
   # Gaming Scheduler
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
@@ -42,7 +42,7 @@
 
   networking.hostName = "nixos";
   time.timeZone = "America/Indiana/Indianapolis";
-  
+
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";
