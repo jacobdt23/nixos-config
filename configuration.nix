@@ -5,27 +5,28 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  # This uses the exact name from the package set we saw earlier
-  boot.kernelPackages = pkgs.linux-cachyos-latest-lto-zen4;
-
-  # Enable Sched-ext (The gaming scheduler)
+  # --- CACHYOS ZEN 4 PERFORMANCE ---
+  # Wrapping the specific Zen 4 package in linuxPackagesFor
+  boot.kernelPackages = pkgs.linuxPackagesFor pkgs.linux-cachyos-latest-lto-zen4;
+  
+  # Gaming Scheduler
   services.scx.enable = true;
-  services.scx.scheduler = "scx_lavd"; # Best for 7800X3D
+  services.scx.scheduler = "scx_lavd";
 
-  # Binary Cache (Vital to avoid a 3-hour kernel compile)
+  # Binary Cache (Crucial)
   nix.settings = {
     substituters = [ "https://nix-cachyos-kernel.cachix.org" ];
     trusted-public-keys = [ "nix-cachyos-kernel.cachix.org-1:99NooIAs9V65063g28yE8h4fP3T8vQvO8S6K2m0VfL8=" ];
   };
 
-  # --- ZRAM (Optimized 16GB for 32GB RAM) ---
+  # --- ZRAM ---
   zramSwap = {
     enable = true;
     algorithm = "zstd";
     memoryPercent = 50;
   };
 
-  # --- Boot/System Basics ---
+  # --- System Basics ---
   boot.loader.grub = {
     enable = true;
     device = "nodev";
@@ -41,7 +42,7 @@
 
   networking.hostName = "nixos";
   time.timeZone = "America/Indiana/Indianapolis";
-
+  
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";

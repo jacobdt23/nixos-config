@@ -1,5 +1,5 @@
 {
-  description = "Jacob's Golden Build - CachyOS Kernel Playground";
+  description = "Jacob's Golden Build - CachyOS Zen 4 Playground";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
@@ -9,7 +9,7 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-
+    
     nixos-cosmic = {
       url = "github:lilyinstarlight/nixos-cosmic";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,7 +21,7 @@
       system = "x86_64-linux";
       specialArgs = { inherit inputs; };
       modules = [
-        # --- THE FIX: Pass the CachyOS Overlay to Nixpkgs ---
+        # Apply the Overlay so pkgs.linux-cachyos-... is available
         ({ ... }: {
           nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.default ];
         })
