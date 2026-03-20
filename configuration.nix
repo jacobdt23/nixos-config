@@ -5,9 +5,9 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  # --- CACHYOS PEAK PERFORMANCE ---
-  # Using the specific Zen 4 LTO kernel found in your 'nix flake show'
-    boot.kernelPackages = pkgs.linuxPackages_cachyos_latest_lto_zen4;
+  # This uses the exact name from the package set we saw earlier
+  boot.kernelPackages = pkgs.linux-cachyos-latest-lto-zen4;
+
   # Enable Sched-ext (The gaming scheduler)
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd"; # Best for 7800X3D
