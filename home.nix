@@ -5,13 +5,13 @@
   home.homeDirectory = "/home/jacob";
   home.stateVersion = "25.11";
 
-  home.packages = with pkgs; [ 
-  fastfetch 
-  tree
-  neovide
-  git
-  scx.full
- ];
+  home.packages = with pkgs; [  
+    fastfetch  
+    tree
+    neovide
+    git
+    scx.full
+  ];
 
   # --- CHRIS TITUS FASTFETCH CONFIG ---
   home.file.".config/fastfetch/config.jsonc".text = ''
@@ -49,7 +49,7 @@
         { "type": "media", "key": "│ └󰝚", "keyColor": "magenta" },
         {
           "type": "custom",
-          "format": " \u001b[90m  \u001b[31m  \u001b[32m  \u001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m  \u001b[38m  \u001b[39m  \u001b[39m    \u001b[38m  \u001b[37m  \u001b[36m  \u001b[35m  \u001b[34m  \u001b[33m  \u001b[32m  \u001b[31m  \u001b[90m "
+          "format": " \u001b[90m  \u001b[31m  \u001b[32m  \u001b[33mu001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m  \u001b[38m  \u001b[39m  \u001b[39m    \u001b[38m  \u001b[37m  \u001b[36m  \u001b[35m  \u001b[34m  \u001b[33m  \u001b[32m  \u001b[31m  \u001b[90m "
         },
         "break"
       ]
@@ -58,6 +58,34 @@
 
   programs.bash = {
     enable = true;
+    shellAliases = {
+      # --- Restored NixOS & Home Manager ---
+      nrs = "sudo nixos-rebuild switch --flake ~/nixos-config#nixos";
+      hms = "home-manager switch --flake ~/nixos-config#jacob";
+      ncfg = "cd ~/nixos-config && nano configuration.nix";
+      hcfg = "cd ~/nixos-config && nano home.nix";
+      nclean = "sudo nix-collect-garbage -d";
+      ngen = "nix-env --list-generations";
+
+      # --- Restored Git Workflow ---
+      gstatus = "git status";
+      gadd = "git add .";
+      gcm = "git commit -m";
+      gpush = "git push";
+      gpull = "git pull";
+      glog = "git log --oneline --graph --decorate";
+
+      # --- Utilities ---
+      l = "ls -alh";
+      ll = "ls -l";
+      nf = "fastfetch";
+      flatclean = "flatpak uninstall --unused";
+
+      # --- Performance Tools ---
+      stats = "sudo scx_lavd --monitor 1";
+      topstats = "sudo scx_top";
+    };
+
     initExtra = ''
       function rebuild {
         git -C ~/nixos-config add .
