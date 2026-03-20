@@ -20,7 +20,6 @@
     github-desktop
     wget
     curl
-    ventoy
     protonup-qt
   ];
 
