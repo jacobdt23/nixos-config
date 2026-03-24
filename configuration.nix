@@ -6,27 +6,23 @@
   nixpkgs.config.allowUnfree = true;
 
   # --- CACHYOS ZEN 4 PERFORMANCE ---
-  # Switching to LTS-Zen4 (Linux 6.18) to fix NVIDIA driver compatibility
   boot.kernelPackages = pkgs.linuxPackagesFor inputs.nix-cachyos-kernel.packages.${pkgs.system}.linux-cachyos-lts-zen4;
 
-  # Gaming Scheduler
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
 
-  # Binary Cache (Vital to avoid local compilation)
   nix.settings = {
     substituters = [ "https://nix-cachyos-kernel.cachix.org" ];
     trusted-public-keys = [ "nix-cachyos-kernel.cachix.org-1:99NooIAs9V65063g28yE8h4fP3T8vQvO8S6K2m0VfL8=" ];
+    experimental-features = [ "nix-command" "flakes" ];
   };
 
-  # --- ZRAM (16GB Swap) ---
   zramSwap = {
     enable = true;
     algorithm = "zstd";
     memoryPercent = 50;
   };
 
-  # --- System Logic ---
   boot.loader.grub = {
     enable = true;
     device = "nodev";
@@ -39,7 +35,10 @@
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
-  networking.hostName = "nixos";
+  # DYNAMIC HOSTNAME: Defaults to nixos but allows the flake to override it
+  networking.hostName = lib.mkDefault "nixos";
+  
+  networking.networkmanager.enable = true;
   time.timeZone = "America/Indiana/Indianapolis";
 
   users.users.jacob = {
