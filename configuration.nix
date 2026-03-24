@@ -1,7 +1,9 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-  imports = [ ./system-apps.nix ];
+  imports = [ ./system-apps.nix
+    ./creative.nix  # Add this to enable Resolve and FFmpeg
+   ];
 
   nixpkgs.config.allowUnfree = true;
 
