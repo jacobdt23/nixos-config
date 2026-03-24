@@ -7,7 +7,7 @@
 
   home.packages = with pkgs; [ fastfetch tree neovide git scx.full ];
 
-  # --- FASTFETCH CONFIG ---
+  # --- CUSTOM FASTFETCH ---
   home.file.".config/fastfetch/config.jsonc".text = ''
     {
       "logo": { "padding": { "top": 1 } },
@@ -30,22 +30,29 @@
   programs.bash = {
     enable = true;
     shellAliases = {
-      hcfg = "cd /etc/nixos && nano home.nix";
-      ncfg = "cd /etc/nixos && nano configuration.nix";
+      # Configuration shortcuts
+      hcfg = "nano ~/nixos-config/home.nix";
+      ncfg = "nano ~/nixos-config/configuration.nix";
+      
+      # Maintenance fixed for Flakes
       nclean = "sudo nix-collect-garbage -d";
       ngen = "sudo nix-env -p /nix/var/nix/profiles/system --list-generations";
-      nrs = "sudo nixos-rebuild switch --flake /etc/nixos#$(hostname) --impure";
-      gstatus = "git status";
-      gadd = "git add .";
-      gcm = "git commit -m";
-      gpush = "git push";
+      
+      # Rebuild logic (uses hostname automatically)
+      nrs = "sudo nixos-rebuild switch --flake ~/nixos-config#$(hostname) --impure";
+      
+      # Git logic
+      gstatus = "git -C ~/nixos-config status";
+      gadd = "git -C ~/nixos-config add .";
+      gcm = "git -C ~/nixos-config commit -m";
+      gpush = "git -C ~/nixos-config push";
     };
     initExtra = ''
       function rebuild {
         local HOST=$(hostname)
-        git -C /etc/nixos add .
-        git -C /etc/nixos commit -m "Rebuild ($HOST): $(date)" || true
-        sudo nixos-rebuild switch --flake /etc/nixos#$HOST --impure
+        git -C ~/nixos-config add .
+        git -C ~/nixos-config commit -m "Rebuild ($HOST): $(date)" || true
+        sudo nixos-rebuild switch --flake ~/nixos-config#$HOST --impure
       }
       if [[ $- == *i* ]]; then fastfetch; fi
     '';
