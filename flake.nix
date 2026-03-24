@@ -5,12 +5,11 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    # UPDATED URL HERE:
-    nix-cachyos-kernel.url = "github:CachyOS/nix-cachyos-kernel";
   };
 
   outputs = { self, nixpkgs, home-manager, ... }@inputs: {
     nixosConfigurations = {
+      # --- BARE METAL HOST (7800X3D Rig) ---
       nixos = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
         modules = [
@@ -21,6 +20,7 @@
         ];
       };
 
+      # --- VIRTUAL MACHINE (The Lab) ---
       vm = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit inputs; };
         modules = [

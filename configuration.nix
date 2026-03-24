@@ -5,26 +5,28 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  # --- PERFORMANCE ---
-  boot.kernelPackages = pkgs.linuxPackagesFor inputs.nix-cachyos-kernel.packages.${pkgs.system}.linux-cachyos-lts-zen4;
+  # --- PERFORMANCE KERNEL (XanMod) ---
+  # Replaces CachyOS to fix the 404 error; still supports scx/gaming
+  boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
+
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
 
-  # --- MAINTENANCE ---
+  # --- NIX SETTINGS ---
   nix.settings = {
-    substituters = [ "https://nix-cachyos-kernel.cachix.org" ];
-    trusted-public-keys = [ "nix-cachyos-kernel.cachix.org-1:99NooIAs9V65063g28yE8h4fP3T8vQvO8S6K2m0VfL8=" ];
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
+    substituters = [ "https://cache.nixos.org" ];
   };
 
+  # --- AUTO MAINTENANCE ---
   nix.gc = {
     automatic = true;
     dates = "weekly";
     options = "--delete-older-than 7d";
   };
 
-  # --- SYSTEM BOOT ---
+  # --- SYSTEM SETUP ---
   zramSwap.enable = true;
   boot.loader.grub = {
     enable = true;
