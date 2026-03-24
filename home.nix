@@ -5,23 +5,27 @@
   home.homeDirectory = "/home/jacob";
   home.stateVersion = "25.11";
 
+  # Adds support for custom binaries (like Doom Emacs)
   home.sessionPath = [ "$HOME/.config/emacs/bin" ];
 
-  home.packages = with pkgs; [     
-    fastfetch     
+  # User-specific packages
+  home.packages = with pkgs; [      
+    fastfetch      
     tree
     neovide
     git
-    scx.full
+    scx.full # Sched-ext schedulers
   ];
 
+  # Emacs Daemon Configuration
   services.emacs = {
     enable = true;
-    package = pkgs.emacs-pgtk; 
+    package = pkgs.emacs-pgtk;  
     client.enable = true;
   };
 
-# --- FASTFETCH CONFIG (Jacob's Custom Setup) ---
+  # --- FASTFETCH CONFIG (Chris Titus / Jacob Custom Hybrid) ---
+  # This creates the config.jsonc file in your ~/.config/fastfetch/ folder
   home.file.".config/fastfetch/config.jsonc".text = ''
     {
       "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
@@ -59,20 +63,22 @@
     }
   '';
 
-
   programs.bash = {
     enable = true;
     shellAliases = {
-      emacs = "emacsclient -c -a 'emacs'";  
+      # Emacs Aliases
+      emacs = "emacsclient -c -a 'emacs'";   
       doom-sync = "/home/jacob/.config/emacs/bin/doom sync";
 
-      # SMART REBUILD: Picks #nixos on desktop and #vm in the VM
+      # NixOS System Management (Host-Aware)
       nrs = "sudo nixos-rebuild switch --flake /etc/nixos#$(hostname) --impure";
-      
       ncfg = "cd /etc/nixos && nano configuration.nix";
       hcfg = "cd /etc/nixos && nano home.nix";
       nclean = "sudo nix-collect-garbage -d";
-      ngen = "nix-env --list-generations";
+      
+      # Fixed Generation Aliases for Flakes
+      ngen = "sudo nix-env -p /nix/var/nix/profiles/system --list-generations";
+      listgens = "sudo nix-env -p /nix/var/nix/profiles/system --list-generations";
 
       # Git Workflow
       gstatus = "git status";
@@ -82,6 +88,7 @@
     };
 
     initExtra = ''
+      # Custom Rebuild Function with Auto-Commit
       function rebuild {
         local HOST=$(hostname)
         echo "🔨 Rebuilding Jacob's Config for host: $HOST"
@@ -89,9 +96,12 @@
         git -C /etc/nixos commit -m "Rebuild ($HOST): $(date)" || true
         sudo nixos-rebuild switch --flake /etc/nixos#$HOST --impure
       }
+      
+      # Run fastfetch on interactive shell start
       if [[ $- == *i* ]]; then fastfetch; fi
     '';
   };
 
+  # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
 }

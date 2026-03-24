@@ -1,53 +1,39 @@
 {
-  description = "Jacob's Golden Build - Dual Personality (Desktop & VM)";
+  description = "Jacob's Universal NixOS Flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel";
-
-    home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nixos-cosmic = {
-      url = "github:lilyinstarlight/nixos-cosmic";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    home-manager.url = "github:nix-community/home-manager";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    nix-cachyos-kernel.url = "github:googleson78/nix-cachyos-kernel";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixos-cosmic, nix-cachyos-kernel, ... }@inputs: {
+  outputs = { self, nixpkgs, home-manager, ... }@inputs: {
     nixosConfigurations = {
-      
-      # --- HOST: NIXOS (Your 7800X3D + RTX 5070 Rig) ---
+      # --- BARE METAL HOST (RTX 5070 Rig) ---
       nixos = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
-          ({ ... }: { nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.default ]; })
           ./configuration.nix
-          ./hardware-configuration.nix
-          ./nvidia.nix 
-          ./creative.nix
-          nixos-cosmic.nixosModules.default
+          ./hardware-configuration.nix # Real NVMe/SSD
+          ./nvidia.nix                # Real GPU Drivers
           home-manager.nixosModules.home-manager
         ];
       };
 
-      # --- HOST: VM (Your YouTube Tutorial Environment) ---
+      # --- VIRTUAL MACHINE (The Lab) ---
       vm = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
-          ./vm-hardware.nix 
-          ./creative.nix
-          nixos-cosmic.nixosModules.default
+          ./vm-hardware.nix           # Virtual Drive Only
           home-manager.nixosModules.home-manager
-          # This override ensures the VM stays named 'vm' regardless of configuration.nix
-          ({ ... }: { networking.hostName = "vm"; })
+          {
+            networking.hostName = "vm";
+          }
         ];
       };
     };
   };
 }
+
