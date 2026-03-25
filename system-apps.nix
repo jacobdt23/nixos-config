@@ -7,7 +7,8 @@
     (if lib.elem "nvidia" config.services.xserver.videoDrivers
     then nvtopPackages.full
     else nvtopPackages.amd)
-
+    
+    bat
     mangohud
     fastfetch
     tree
