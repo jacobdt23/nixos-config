@@ -14,7 +14,6 @@
     brave
     discord
     git
-    neovide
     nixpkgs-fmt
     kdePackages.kate
     github-desktop
