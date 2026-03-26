@@ -3,7 +3,6 @@
 {
   imports = [ 
     ./system-apps.nix
-    ./creative.nix 
   ];
 
   nixpkgs.config.allowUnfree = true;
