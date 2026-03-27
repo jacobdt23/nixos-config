@@ -18,6 +18,8 @@ in
     curl
     git
     nixpkgs-fmt
+    neovim-qt 
+    neovide
     alacritty
     emacs
     ripgrep
