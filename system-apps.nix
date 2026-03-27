@@ -14,6 +14,13 @@ in
     # GPU Monitoring
     (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
     
+
+# --- ADD THESE FOR TREESITTER ---
+    gcc            # The C compiler LazyVim is asking for
+    gnumake        # Required to run the build scripts
+    tree-sitter    # The CLI tool for managing parsers
+    # --------------------------------
+
     # CLI Essentials
     bat
     mangohud
