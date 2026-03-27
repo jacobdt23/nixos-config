@@ -32,7 +32,7 @@ in
     davinci-resolve-studio
     ffmpeg_7-full
     drs-fix
-    wl-copy
+    wl-clipboard
   ];
   environment.sessionVariables = {
     ALSA_CARD = "Generic";
