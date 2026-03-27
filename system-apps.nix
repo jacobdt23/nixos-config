@@ -33,7 +33,7 @@ in
     curl
     git
     nixpkgs-fmt
-    
+    alacritty
     # --- Emacs / Doom Emacs ---
     emacs
     ripgrep

@@ -41,7 +41,7 @@
         { "type": "sound", "key": " AUDIO", "format": "{2}", "keyColor": "magenta" },
         { "type": "player", "key": "│ ├󰥠", "keyColor": "magenta" },
         { "type": "media", "key": "│ └󰝚", "keyColor": "magenta" },
-        { "type": "custom", "format": "\u001b[90m  \u001b[31m  \u001b[32m  \u001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m  \u001b[38m  \u001b[39m  \u001b[39m    \u001b[38m  \u001b[37m  \u001b[36m  \u001b[35m  \u001b[34m  \u001b[33m  \u001b[32m  \u001b[31m  \u001b[90m " },
+        { "type": "custom", "format": "\u001b[90m  \u001b[31m  \u001b[32m  \u001b[33m  \u001b[34m  \u001b[35m  \u001b[36m  \u001b[37m  \u001b[38m  \u001b[39m  \u001b[39m    \u001b[38m  \u001b[37m  \u001b[36m  \u001b[35m \u001b[34m  \u001b[33m  \u001b[32m  \u001b[31m  \u001b[90m " },
         "break"
       ]
     }
@@ -63,9 +63,16 @@
     initExtra = ''
       function rebuild {
         local HOST=$(hostname)
+        echo "📦 Staging changes..."
         git -C ~/nixos-config add .
-        git -C ~/nixos-config commit -m "Rebuild ($HOST): $(date)" || true
-        sudo nixos-rebuild switch --flake ~/nixos-config#$HOST --impure
+        
+        echo "📝 Committing to local Git..."
+        git -C ~/nixos-config commit -m "Rebuild ($HOST)" || true
+        
+        echo "🚀 Rebuilding NixOS..."
+        sudo nixos-rebuild switch --flake ~/nixos-config#$HOST --impure && \
+        echo "☁️ Pushing to GitHub..." && \
+        git -C ~/nixos-config push
       }
       if [[ $- == *i* ]]; then fastfetch; fi
     '';
