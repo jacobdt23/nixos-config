@@ -7,9 +7,14 @@ let
   '';
 in
 {
+  # Smart CUDA support based on the active driver
   nixpkgs.config.cudaSupport = lib.elem "nvidia" config.services.xserver.videoDrivers;
+
   environment.systemPackages = with pkgs; [
+    # GPU Monitoring
     (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
+    
+    # CLI Essentials
     bat
     mangohud
     fastfetch
@@ -17,27 +22,37 @@ in
     wget
     curl
     git
-    nixpkgs-fmt
-    neovim-qt 
-    alacritty
-    emacs
     ripgrep
     fd
+    wl-clipboard
+    nixpkgs-fmt
+
+    # Performance / Gaming
+    scx.full
+    gamemode
+    protonup-qt
+
+    # Desktop / Creative
     brave
     discord
     kdePackages.kate
     github-desktop
-    protonup-qt
     vlc
     davinci-resolve-studio
     ffmpeg_7-full
     drs-fix
-    wl-clipboard
+
+    # Dev / Editors
+    neovim-qt 
+    alacritty
+    emacs
   ];
+
   environment.sessionVariables = {
     ALSA_CARD = "Generic";
     LD_LIBRARY_PATH = [ "${pkgs.libpulseaudio}/lib" ];
   };
+
   programs.obs-studio = {
     enable = true;
     package = pkgs.obs-studio.override {
@@ -45,6 +60,7 @@ in
       cudaSupport = lib.elem "nvidia" config.services.xserver.videoDrivers;
     };
   };
+
   programs.steam.enable = true;
   programs.gamemode.enable = true;
 }
