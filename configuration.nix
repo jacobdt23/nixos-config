@@ -1,7 +1,7 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-  imports = [ 
+  imports = [
     ./system-apps.nix
   ];
 

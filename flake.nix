@@ -15,7 +15,7 @@
         modules = [
           ./configuration.nix
           ./hardware-configuration.nix # Loads physical drives
-          ./nvidia.nix                # Loads physical GPU drivers
+          ./nvidia.nix # Loads physical GPU drivers
           home-manager.nixosModules.home-manager
         ];
       };
@@ -25,7 +25,7 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
-          ./vm-hardware.nix           # Loads virtual drive only
+          ./vm-hardware.nix # Loads virtual drive only
           home-manager.nixosModules.home-manager
           {
             # Overrides hostname to "vm" locally

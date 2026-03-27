@@ -10,9 +10,27 @@ in
   nixpkgs.config.cudaSupport = lib.elem "nvidia" config.services.xserver.videoDrivers;
   environment.systemPackages = with pkgs; [
     (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
-    bat mangohud fastfetch tree wget curl git nixpkgs-fmt alacritty
-    emacs ripgrep fd brave discord kdePackages.kate github-desktop protonup-qt vlc
-    davinci-resolve-studio ffmpeg_7-full drs-fix
+    bat
+    mangohud
+    fastfetch
+    tree
+    wget
+    curl
+    git
+    nixpkgs-fmt
+    alacritty
+    emacs
+    ripgrep
+    fd
+    brave
+    discord
+    kdePackages.kate
+    github-desktop
+    protonup-qt
+    vlc
+    davinci-resolve-studio
+    ffmpeg_7-full
+    drs-fix
   ];
   environment.sessionVariables = {
     ALSA_CARD = "Generic";
