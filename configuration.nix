@@ -1,64 +1,36 @@
-{ config, pkgs, lib, inputs, ... }:
+{ config, pkgs, ... }:
 
 {
-  imports = [ ./system-apps.nix ];
+  imports =
+    [ 
+      ./hardware-configuration.nix
+      ./nvidia.nix
+      ./creative.nix
+      ./system-apps.nix
+    ];
 
-  nixpkgs.config.allowUnfree = true;
-  boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
-
-  # --- VIRTUALIZATION (KVM/QEMU) ---
-  virtualisation.libvirtd.enable = true;
-  programs.virt-manager.enable = true;
-  # Optional: Allows passing USB devices (like your HyperX headset) to the VM
-  virtualisation.spiceUSBRedirection.enable = true;
-
-  services.scx.enable = true;
-  services.scx.scheduler = "scx_lavd";
-
-  # --- NIX SETTINGS ---
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    auto-optimise-store = true;
-    substituters = [ "https://cache.nixos.org" ];
-    trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
-  };
-
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 7d";
-  };
-
-  zramSwap.enable = true;
+  # Bootloader settings for dual-booting with Windows 11
   boot.loader.grub = {
     enable = true;
     device = "nodev";
     efiSupport = true;
     useOSProber = true;
   };
-  boot.loader.efi.canTouchEfiVariables = true;
 
-  services.xserver.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.desktopManager.plasma6.enable = true;
+  # Kernel and Schedulers for 7800X3D
+  boot.kernelPackages = pkgs.linuxPackages_xanmod; 
 
-  networking.hostName = lib.mkDefault "nixos";
+  networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+
   time.timeZone = "America/Indiana/Indianapolis";
+  time.hardwareClockInLocalTime = true;
 
   users.users.jacob = {
     isNormalUser = true;
-    description = "Jacob Turner";
-    # libvirtd group allows you to manage VMs without sudo
-    extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
+    extraGroups = [ "wheel" "networkmanager" "video" ];
   };
 
-  home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users.jacob = import ./home.nix;
-    extraSpecialArgs = { inherit inputs; };
-  };
-
-  system.stateVersion = "25.11";
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  system.stateVersion = "26.05";
 }

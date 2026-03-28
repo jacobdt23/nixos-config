@@ -48,26 +48,18 @@
   programs.bash = {
     enable = true;
     shellAliases = {
-      # Navigation
       hcfg = "cd ~/GitHub/nixos-config && nano home.nix";
       ncfg = "cd ~/GitHub/nixos-config && nano configuration.nix";
       gh = "cd ~/GitHub";
-
-      # Rebuilds
       nrs = "sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos --impure";
       hms = "sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos --impure";
-
-      # Git (Simplified)
       gadd = "git add .";
       gcm = "git commit -m";
       gpush = "git push";
       gpull = "git pull";
-
-      # Hardware & Apps
       nf = "fastfetch";
       doom-sync = "~/.config/emacs/bin/doom sync";
       stats = "sudo scx_lavd --monitor 1";
-      copy-config = "bat ~/GitHub/nixos-config/*.nix | wl-copy";
     };
     initExtra = ''
       rebuild() {
