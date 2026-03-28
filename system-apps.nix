@@ -7,21 +7,16 @@ let
   '';
 in
 {
-  # Smart CUDA support based on the active driver
   nixpkgs.config.cudaSupport = lib.elem "nvidia" config.services.xserver.videoDrivers;
 
   environment.systemPackages = with pkgs; [
-    # GPU Monitoring
     (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
     
+    # Virtualization Support
+    virt-viewer
+    spice-gtk
 
-# --- ADD THESE FOR TREESITTER ---
-    gcc            # The C compiler LazyVim is asking for
-    gnumake        # Required to run the build scripts
-    tree-sitter    # The CLI tool for managing parsers
-    # --------------------------------
-
-    # CLI Essentials
+    # CLI / System Tools
     bat
     mangohud
     fastfetch
@@ -34,12 +29,16 @@ in
     wl-clipboard
     nixpkgs-fmt
 
-    # Performance / Gaming
+    # Neovim-Qt & Treesitter Dependencies
+    neovim-qt
+    gcc
+    gnumake
+    tree-sitter
+
+    # Gaming / Creative
     scx.full
     gamemode
     protonup-qt
-
-    # Desktop / Creative
     brave
     discord
     kdePackages.kate
@@ -48,11 +47,6 @@ in
     davinci-resolve-studio
     ffmpeg_7-full
     drs-fix
-
-    # Dev / Editors
-    neovim-qt 
-    alacritty
-    emacs
   ];
 
   environment.sessionVariables = {

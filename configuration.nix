@@ -1,16 +1,21 @@
 { config, pkgs, lib, inputs, ... }:
 
 {
-  imports = [
-    ./system-apps.nix
-  ];
+  imports = [ ./system-apps.nix ];
 
   nixpkgs.config.allowUnfree = true;
   boot.kernelPackages = pkgs.linuxPackages_xanmod_latest;
 
+  # --- VIRTUALIZATION (KVM/QEMU) ---
+  virtualisation.libvirtd.enable = true;
+  programs.virt-manager.enable = true;
+  # Optional: Allows passing USB devices (like your HyperX headset) to the VM
+  virtualisation.spiceUSBRedirection.enable = true;
+
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
 
+  # --- NIX SETTINGS ---
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
@@ -44,6 +49,7 @@
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";
+    # libvirtd group allows you to manage VMs without sudo
     extraGroups = [ "networkmanager" "wheel" "libvirtd" ];
   };
 
