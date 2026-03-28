@@ -5,11 +5,10 @@
     [ 
       ./hardware-configuration.nix
       ./nvidia.nix
-      ./creative.nix
       ./system-apps.nix
+      # Removed creative.nix because it is missing from the folder
     ];
 
-  # Bootloader settings for dual-booting with Windows 11
   boot.loader.grub = {
     enable = true;
     device = "nodev";
@@ -17,7 +16,6 @@
     useOSProber = true;
   };
 
-  # Kernel and Schedulers for 7800X3D
   boot.kernelPackages = pkgs.linuxPackages_xanmod; 
 
   networking.hostName = "nixos";
