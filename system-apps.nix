@@ -10,7 +10,7 @@ in
   nixpkgs.config.cudaSupport = lib.elem "nvidia" config.services.xserver.videoDrivers;
 
   environment.systemPackages = with pkgs; [
-    (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
+#    (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
     
     # Virtualization Support
     virt-viewer
@@ -44,7 +44,7 @@ in
     kdePackages.kate
     github-desktop
     vlc
-    davinci-resolve-studio
+ #   davinci-resolve-studio
     ffmpeg_7-full
     drs-fix
   ];
