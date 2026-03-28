@@ -12,7 +12,7 @@
     shellAliases = {
       hcfg = "cd ~/GitHub/nixos-config && nano home.nix";
       ncfg = "cd ~/GitHub/nixos-config && nano configuration.nix";
-      gh = "cd ~/GitHub";
+      cgh = "cd ~/GitHub";
       nrs = "sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos --impure";
       hms = "sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos --impure";
       gadd = "git add .";
