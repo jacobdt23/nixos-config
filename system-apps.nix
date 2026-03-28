@@ -11,7 +11,8 @@ in
 
   environment.systemPackages = with pkgs; [
      (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
-    
+   
+    github-cli 
     hugo
     virt-viewer
     spice-gtk
