@@ -1,26 +1,23 @@
 { config, pkgs, ... }:
 
 {
-  imports =
-    [ 
-      ./hardware-configuration.nix
-      ./nvidia.nix
-      ./system-apps.nix
-      # creative.nix removed as it is missing from your directory
-    ];
+  imports = [ 
+    ./hardware-configuration.nix
+    ./nvidia.nix
+    ./system-apps.nix
+  ];
 
-  # Allow unfree packages (Required for NVIDIA drivers)
   nixpkgs.config.allowUnfree = true;
 
   boot.loader.grub = {
     enable = true;
     device = "nodev";
     efiSupport = true;
-    useOSProber = true; # Keeps Windows 11 on the second 990 PRO visible
+    useOSProber = true;
   };
 
-  # High-performance kernel for your 7800X3D
-  boot.kernelPackages = pkgs.linuxPackages_xanmod; 
+  # Testing with latest stable kernel to prevent Xanmod/Nvidia reboots
+  boot.kernelPackages = pkgs.linuxPackages_latest; 
 
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
@@ -30,7 +27,7 @@
 
   users.users.jacob = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
   };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
