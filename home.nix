@@ -23,6 +23,7 @@
       doom-sync = "~/.config/emacs/bin/doom sync";
       stats = "sudo scx_lavd --monitor 1";
       copy-config = "bat ~/GitHub/nixos-config/*.nix | wl-copy";
+      cleanup = "sudo nix-collect-garbage -d && sudo nix-store --optimise";
     };
     initExtra = ''
       rebuild() {
