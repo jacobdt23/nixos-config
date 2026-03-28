@@ -29,6 +29,7 @@
         { "type": "wmtheme", "key": "│ ├󰉼", "keyColor": "blue" },
         { "type": "icons", "key": "│ ├󰀻", "keyColor": "blue" },
         { "type": "cursor", "key": "│ ├", "keyColor": "blue" },
+        { "type": "terminalfont", "key": "│ ├", "keyColor": "blue" },
         { "type": "terminal", "key": "│ └", "keyColor": "blue" },
         { "type": "cpu", "key": "│ ├󰻠", "keyColor": "green" },
         { "type": "gpu", "key": "│ ├󰻑", "format": "{2}", "keyColor": "green" },
@@ -68,19 +69,18 @@
       stats = "sudo scx_lavd --monitor 1";
       copy-config = "bat ~/GitHub/nixos-config/*.nix | wl-copy";
     };
-initExtra = ''
+    initExtra = ''
       rebuild() {
         local HOST=$(hostname)
-        # Pointing to the new GitHub directory
         git -C ~/GitHub/nixos-config add .
         git -C ~/GitHub/nixos-config commit -m "Rebuild ($HOST)" || true
-        
-        # Rebuilding from the new Flake path
         sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#$HOST --impure && \
         echo "☁ Pushing to GitHub..." && \
         git -C ~/GitHub/nixos-config push
       }
       if [[ $- == *i* ]]; then fastfetch; fi
     '';
+  };
+
   programs.home-manager.enable = true;
 }
