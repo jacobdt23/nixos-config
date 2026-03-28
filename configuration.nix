@@ -7,8 +7,10 @@
     ./system-apps.nix
   ];
 
+  # Allow unfree packages for NVIDIA drivers
   nixpkgs.config.allowUnfree = true;
 
+  # GRUB setup for dual-booting with Windows 11 on the second 990 PRO
   boot.loader.grub = {
     enable = true;
     device = "nodev";
@@ -16,8 +18,8 @@
     useOSProber = true;
   };
 
-  # Testing with latest stable kernel to prevent Xanmod/Nvidia reboots
-  boot.kernelPackages = pkgs.linuxPackages_latest; 
+  # Switching to the latest stable kernel to fix the TTY/Display crash
+  boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;

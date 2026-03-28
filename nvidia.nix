@@ -6,8 +6,8 @@
   hardware.nvidia = {
     modesetting.enable = true;
     open = true; # REQUIRED for RTX 50-series/Blackwell
-    powerManagement.enable = false; # Prevents flicker on dual LG monitors
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    powerManagement.enable = false; # Prevents flickering on dual 1080p monitors
+    package = config.boot.kernelPackages.nvidiaPackages.production;
   };
 
   hardware.graphics = {
@@ -16,11 +16,10 @@
     extraPackages = with pkgs; [ nvidia-vaapi-driver ];
   };
 
-  # Forces Plasma and Electron apps to use Wayland/Nvidia correctly
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    NIXOS_OZONE_WL = "1"; # Critical for Brave/Discord/Electron on Wayland
+    NIXOS_OZONE_WL = "1"; # Ensures Brave and Discord use Wayland hardware acceleration
   };
 }
