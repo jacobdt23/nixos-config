@@ -9,7 +9,6 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  # GRUB setup for dual-booting with Windows 11
   boot.loader.grub = {
     enable = true;
     device = "nodev";
@@ -17,16 +16,18 @@
     useOSProber = true;
   };
 
-  # High-performance stable kernel for RTX 50-series compatibility
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
+  
+  # DNS FIX: Use Google and Cloudflare DNS to ensure NVIDIA servers resolve
+  networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
+  services.resolved.enable = true;
 
   time.timeZone = "America/Indiana/Indianapolis";
   time.hardwareClockInLocalTime = true;
 
-  # Explicitly enable the Graphical Desktop
   services.xserver.enable = true;
   services.displayManager.sddm.enable = true;
   services.displayManager.sddm.wayland.enable = true;
