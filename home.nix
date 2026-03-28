@@ -29,6 +29,7 @@
         { "type": "wmtheme", "key": "│ ├󰉼", "keyColor": "blue" },
         { "type": "icons", "key": "│ ├󰀻", "keyColor": "blue" },
         { "type": "cursor", "key": "│ ├", "keyColor": "blue" },
+        { "type": "terminalfont", "key": "│ ├", "keyColor": "blue" },
         { "type": "terminal", "key": "│ └", "keyColor": "blue" },
         { "type": "cpu", "key": "│ ├󰻠", "keyColor": "green" },
         { "type": "gpu", "key": "│ ├󰻑", "format": "{2}", "keyColor": "green" },

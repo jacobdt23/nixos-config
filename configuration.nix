@@ -6,16 +6,20 @@
       ./hardware-configuration.nix
       ./nvidia.nix
       ./system-apps.nix
-      # Removed creative.nix because it is missing from the folder
+      # creative.nix removed as it is missing from your directory
     ];
+
+  # Allow unfree packages (Required for NVIDIA drivers)
+  nixpkgs.config.allowUnfree = true;
 
   boot.loader.grub = {
     enable = true;
     device = "nodev";
     efiSupport = true;
-    useOSProber = true;
+    useOSProber = true; # Keeps Windows 11 on the second 990 PRO visible
   };
 
+  # High-performance kernel for your 7800X3D
   boot.kernelPackages = pkgs.linuxPackages_xanmod; 
 
   networking.hostName = "nixos";
