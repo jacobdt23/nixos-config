@@ -7,10 +7,9 @@
     ./system-apps.nix
   ];
 
-  # Allow unfree packages for NVIDIA drivers
   nixpkgs.config.allowUnfree = true;
 
-  # GRUB setup for dual-booting with Windows 11 on the second 990 PRO
+  # GRUB setup for dual-booting with Windows 11
   boot.loader.grub = {
     enable = true;
     device = "nodev";
@@ -18,7 +17,7 @@
     useOSProber = true;
   };
 
-  # Switching to the latest stable kernel to fix the TTY/Display crash
+  # High-performance stable kernel for RTX 50-series compatibility
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   networking.hostName = "nixos";
@@ -26,6 +25,12 @@
 
   time.timeZone = "America/Indiana/Indianapolis";
   time.hardwareClockInLocalTime = true;
+
+  # Explicitly enable the Graphical Desktop
+  services.xserver.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+  services.desktopManager.plasma6.enable = true;
 
   users.users.jacob = {
     isNormalUser = true;

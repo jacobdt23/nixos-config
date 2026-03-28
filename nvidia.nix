@@ -5,8 +5,8 @@
 
   hardware.nvidia = {
     modesetting.enable = true;
-    open = true; # REQUIRED for RTX 50-series/Blackwell
-    powerManagement.enable = false; # Prevents flickering on dual 1080p monitors
+    open = true; # REQUIRED for RTX 50-series
+    powerManagement.enable = false; 
     package = config.boot.kernelPackages.nvidiaPackages.production;
   };
 
@@ -20,6 +20,6 @@
     LIBVA_DRIVER_NAME = "nvidia";
     GBM_BACKEND = "nvidia-drm";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    NIXOS_OZONE_WL = "1"; # Ensures Brave and Discord use Wayland hardware acceleration
+    NIXOS_OZONE_WL = "1"; 
   };
 }

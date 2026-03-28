@@ -10,13 +10,10 @@ in
   nixpkgs.config.cudaSupport = lib.elem "nvidia" config.services.xserver.videoDrivers;
 
   environment.systemPackages = with pkgs; [
-#    (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
+    # (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
     
-    # Virtualization Support
     virt-viewer
     spice-gtk
-
-    # CLI / System Tools
     bat
     mangohud
     fastfetch
@@ -28,14 +25,10 @@ in
     fd
     wl-clipboard
     nixpkgs-fmt
-
-    # Neovim-Qt & Treesitter Dependencies
     neovim-qt
     gcc
     gnumake
     tree-sitter
-
-    # Gaming / Creative
     scx.full
     gamemode
     protonup-qt
@@ -44,15 +37,10 @@ in
     kdePackages.kate
     github-desktop
     vlc
- #   davinci-resolve-studio
+    # davinci-resolve-studio
     ffmpeg_7-full
     drs-fix
   ];
-
-  environment.sessionVariables = {
-    ALSA_CARD = "Generic";
-    LD_LIBRARY_PATH = [ "${pkgs.libpulseaudio}/lib" ];
-  };
 
   programs.obs-studio = {
     enable = true;
