@@ -31,6 +31,7 @@ in
     gcc
     gnumake
     tree-sitter
+    tmux
     scx.full
     gamemode
     protonup-qt
