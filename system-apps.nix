@@ -11,6 +11,7 @@ in
 
   environment.systemPackages = with pkgs; [
      (if lib.elem "nvidia" config.services.xserver.videoDrivers then nvtopPackages.full else nvtopPackages.amd)
+    emacs
     gimp
     github-cli 
     hugo
