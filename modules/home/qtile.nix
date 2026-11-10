@@ -251,6 +251,7 @@
                 fontsize=10,
                 padding=8,
                 max_chars=35,
+                markup=False,
             ),
 
             # Center Expander Spacer

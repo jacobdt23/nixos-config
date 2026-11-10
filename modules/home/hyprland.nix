@@ -165,7 +165,6 @@ in
           size = 8;
           passes = 3;
           vibrancy = 0.1696;
-          new_optimizations = true;
           xray = true;
         };
       };
@@ -189,10 +188,9 @@ in
         no_hardware_cursors = true;
       };
 
-      gestures = {
-        workspace_swipe = true;
-        workspace_swipe_fingers = 3;
-      };
+      gesture = [
+        "3, horizontal, workspace"
+      ];
 
       dwindle = {
         preserve_split = true;
@@ -214,25 +212,21 @@ in
         no_donation_nag = true;
       };
 
-      # ---- WINDOW & LAYER RULES ----
-      windowrulev2 = [
-        "suppressevent maximize, class:.*"
-        "nofocus, class:^$, title:^$, xwayland:1, floating:1, fullscreen:0, pinned:0"
-        "float, class:^(hyprland-run)$"
-        "move 20 100%-120, class:^(hyprland-run)$"
-        "float, class:^(.*hypr-?settings.*|io\\.github\\.hyprsettings)$"
-        "size 950 660, class:^(.*hypr-?settings.*|io\\.github\\.hyprsettings)$"
-        "center, class:^(.*hypr-?settings.*|io\\.github\\.hyprsettings)$"
-        "float, class:^(hyprfrost-welcome)$"
-        "size 860 600, class:^(hyprfrost-welcome)$"
-        "center, class:^(hyprfrost-welcome)$"
+      # ---- WINDOW & LAYER RULES (Hyprland 0.53+ syntax) ----
+      windowrule = [
+        "suppress_event maximize, match:class .*"
+        "no_focus on, match:class ^$, match:title ^$, match:xwayland 1, match:float 1, match:fullscreen 0, match:pin 0"
+        "float on, match:class ^(hyprland-run)$"
+        "move 20 monitor_h-120, match:class ^(hyprland-run)$"
+        "float on, size 760 520, center on, match:class .*pavucontrol.*"
+        "float on, size 950 660, center on, match:class ^(?:.*hypr-?settings.*|io\\.github\\.hyprsettings)$"
+        "float on, size 860 600, center on, match:class ^(hyprfrost-welcome)$"
       ];
 
       layerrule = [
-        "blur, jacob-(topbar|dock|launcher|clipboard|power|calendar|notifications|toast|media|keybinds|welcome|contextmenu|appcontextmenu|taskbarmenu)"
-        "ignorealpha 0.25, jacob-(topbar|dock|launcher|clipboard|power|calendar|notifications|toast|media|keybinds|welcome|contextmenu|appcontextmenu|taskbarmenu)"
-        "noanim, jacob-topbar"
-        "noanim, jacob-dock"
+        "blur on, match:namespace jacob-(topbar|dock|launcher|clipboard|power|calendar|notifications|toast|media|keybinds|welcome|contextmenu|appcontextmenu|taskbarmenu)"
+        "no_anim on, match:namespace jacob-topbar"
+        "no_anim on, match:namespace jacob-dock"
       ];
 
       # ---- KEYBINDS ----

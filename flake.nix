@@ -36,11 +36,13 @@
           {
             networking.hostName = "vm";
             users.users.jacob.initialPassword = "nixos";
+            users.users.jacob.password = "nixos";
             virtualisation.vmVariant = {
               virtualisation = {
                 memorySize = 4096;
                 cores = 4;
                 graphics = true;
+                resolution = { x = 1920; y = 1080; };
                 qemu.options = [
                   "-vga virtio"
                   "-display vnc=0.0.0.0:0,websocket=5700"

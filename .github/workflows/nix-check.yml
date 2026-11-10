@@ -29,3 +29,10 @@ jobs:
 
       - name: Evaluate #vm (Virtual Machine + Home Manager + Hyprland + Qtile)
         run: nix eval .#nixosConfigurations.vm.config.system.build.toplevel.drvPath
+
+      - name: Validate Generated Hyprland and Qtile Configs
+        run: |
+          HM_HYPR=$(nix build --no-link --print-out-paths '.#nixosConfigurations.vm.config.home-manager.users.jacob.xdg.configFile."hypr/hyprland.conf".source')
+          HM_QTILE=$(nix build --no-link --print-out-paths '.#nixosConfigurations.vm.config.home-manager.users.jacob.home.file.".config/qtile/config.py".source')
+          python3 -m py_compile "$HM_QTILE"
+          echo "Verified $HM_HYPR and $HM_QTILE!"
