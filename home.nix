@@ -182,8 +182,8 @@
       editqtile = "neovide ~/GitHub/nixos-config/modules/home/qtile.nix > /dev/null 2>&1 & disown";
 
       # --- Rebuilds & Generations ---
-      nrs = "sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos --impure";
-      hms = "sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos --impure";
+      nrs = "git -C ~/GitHub/nixos-config add . && sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos";
+      hms = "git -C ~/GitHub/nixos-config add . && sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos";
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d && nix-store --optimise";
       nclean = "sudo nix-collect-garbage -d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
@@ -259,7 +259,7 @@
 
         nixpkgs-fmt ~/GitHub/nixos-config/*.nix ~/GitHub/nixos-config/modules/home/*.nix 2>/dev/null || true
 
-        if sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#$TARGET --impure; then
+        if sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#$TARGET; then
           git -C ~/GitHub/nixos-config add .
           git -C ~/GitHub/nixos-config commit -m "$msg" || true
           echo -e "\033[1;36m☁ Pushing to GitHub...\033[0m"

@@ -10,7 +10,7 @@ Modular NixOS + Home Manager configuration for an AMD Ryzen 7 7800X3D and NVIDIA
 
 ## 🛠 Quick Commands
 - `rebuild`: Auto-detects hostname (`nixos` or `vm`), commits changes, switches flake, and pushes to GitHub.
-- `nrs` / `hms`: `sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos --impure`
+- `nrs` / `hms`: `sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos`
 - `cleanup`: Delete old generations and optimize the Nix store.
 
 ## 📂 Configuration Structure
