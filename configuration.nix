@@ -63,7 +63,7 @@
     powerOnBoot = true;
   };
 
-  # --- Desktop Environment ---
+  # --- Desktop Environment & Window Managers ---
   services.xserver.enable = true;
   services.displayManager.sddm = {
     enable = true;
@@ -73,6 +73,14 @@
   programs.hyprland = {
     enable = true;
     xwayland.enable = true;
+  };
+  services.xserver.windowManager.qtile = {
+    enable = true;
+    extraPackages = python3Packages: with python3Packages; [
+      psutil
+      dbus-next
+      pyxdg
+    ];
   };
 
   # --- Users & Home Manager Integration ---

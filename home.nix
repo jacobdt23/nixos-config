@@ -3,6 +3,7 @@
 {
   imports = [
     ./modules/home/hyprland.nix
+    ./modules/home/qtile.nix
   ];
 
   home.username = "jacob";

@@ -5,7 +5,7 @@ Modular NixOS + Home Manager configuration for an AMD Ryzen 7 7800X3D and NVIDIA
 - **Modular Flake Switchboard**: Build for **Physical Metal (`#nixos`)** or a lightweight **Virtual Machine (`#vm`)** from a single repository.
 - **Blackwell Optimized**: Dedicated `nvidia.nix` using open-kernel modules, `nvidiaPackages.production`, and Wayland session variables.
 - **Scoped CUDA & Cachix**: Scoped CUDA support for OBS Studio + `nix-community` binary cache so rebuilds don't compile massive packages from source.
-- **Dual Desktop Ready**: SDDM Wayland configured with both **KDE Plasma 6** and **Hyprland** (Tokyo Night theme).
+- **Triple Desktop Ready**: SDDM configured with **KDE Plasma 6**, **Hyprland** (Wayland), and **Qtile** (X11/Wayland with Picom & Tokyo Night bars).
 - **Creative & Gaming Suites**: Modular `creative.nix` (DaVinci Resolve Studio, OBS with NVENC/CUDA, `drs-fix`) and `gaming.nix` (Steam, GameMode, ProtonUp-Qt, MangoHUD, `scx_lavd`).
 
 ## 🛠 Quick Commands
@@ -28,6 +28,7 @@ Modular NixOS + Home Manager configuration for an AMD Ryzen 7 7800X3D and NVIDIA
   - `kitty.nix`: Kitty terminal configuration.
   - `dunst.nix`: Dunst notification daemon configuration.
   - `hyprlock.nix`: Hyprlock lock screen and Hyprpaper wallpaper configuration.
+  - `qtile.nix`: Qtile window manager (`config.py`, `autostart.sh`) and Picom compositor (`picom.conf`).
 
 ---
 *Built for the 500 Subscriber Milestone. Join the Rabbit Hole!*
