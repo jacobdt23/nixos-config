@@ -29,7 +29,7 @@ let
 
   # Nix-packaged version of ~/.local/bin/hypr-clipboard
   hypr-clipboard = pkgs.writeShellScriptBin "hypr-clipboard" ''
-    selected=$(${pkgs.cliphist}/bin/cliphist list 2>/dev/null | ${pkgs.rofi-wayland}/bin/rofi -dmenu -p "Clipboard" 2>/dev/null)
+    selected=$(${pkgs.cliphist}/bin/cliphist list 2>/dev/null | ${pkgs.rofi}/bin/rofi -dmenu -p "Clipboard" 2>/dev/null)
     if [ -n "$selected" ]; then
       if [ -n "$WAYLAND_DISPLAY" ]; then
         printf "%s" "$selected" | ${pkgs.cliphist}/bin/cliphist decode | ${pkgs.wl-clipboard}/bin/wl-copy
@@ -52,7 +52,7 @@ in
   home.packages = with pkgs; [
     kitty
     waybar
-    rofi-wayland
+    rofi
     dunst
     libnotify
     swww
