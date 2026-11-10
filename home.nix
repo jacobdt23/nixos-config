@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ./hyprland.nix
+    ./modules/home/hyprland.nix
   ];
 
   home.username = "jacob";

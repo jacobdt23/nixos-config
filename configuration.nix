@@ -48,6 +48,21 @@
   time.hardwareClockInLocalTime = true;
   i18n.defaultLocale = "en_US.UTF-8";
 
+  # --- Audio (PipeWire) & Bluetooth ---
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    wireplumber.enable = true;
+  };
+
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
+
   # --- Desktop Environment ---
   services.xserver.enable = true;
   services.displayManager.sddm = {
@@ -64,7 +79,7 @@
   users.users.jacob = {
     isNormalUser = true;
     description = "Jacob Turner";
-    extraGroups = [ "wheel" "networkmanager" "video" "libvirtd" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "audio" "libvirtd" ];
   };
 
   home-manager = {
@@ -78,6 +93,14 @@
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     auto-optimise-store = true;
+    substituters = [
+      "https://cache.nixos.org"
+      "https://nix-community.cachix.org"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
   };
 
   nix.gc = {

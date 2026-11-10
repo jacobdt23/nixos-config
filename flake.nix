@@ -19,6 +19,8 @@
           ./configuration.nix
           ./hardware-configuration.nix
           ./nvidia.nix
+          ./creative.nix
+          ./gaming.nix
           home-manager.nixosModules.home-manager
         ];
       };
