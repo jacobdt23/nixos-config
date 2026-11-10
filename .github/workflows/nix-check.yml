@@ -1,0 +1,31 @@
+name: Verify NixOS Flake
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  evaluate:
+    name: Evaluate #nixos and #vm Configurations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v30
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Show Flake Outputs
+        run: nix flake show
+
+      - name: Evaluate #nixos (Bare Metal + RTX 5070 + Home Manager + Hyprland + Qtile)
+        run: nix eval .#nixosConfigurations.nixos.config.system.build.toplevel.drvPath
+
+      - name: Evaluate #vm (Virtual Machine + Home Manager + Hyprland + Qtile)
+        run: nix eval .#nixosConfigurations.vm.config.system.build.toplevel.drvPath

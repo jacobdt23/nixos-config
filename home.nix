@@ -184,6 +184,7 @@
       # --- Rebuilds & Generations ---
       nrs = "git -C ~/GitHub/nixos-config add . && sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos";
       hms = "git -C ~/GitHub/nixos-config add . && sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos";
+      nix-check = "gh run list -R jacobdt23/nixos-config --workflow nix-check.yml";
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d && nix-store --optimise";
       nclean = "sudo nix-collect-garbage -d";
       listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
