@@ -35,6 +35,22 @@
           home-manager.nixosModules.home-manager
           {
             networking.hostName = "vm";
+            users.users.jacob.initialPassword = "nixos";
+            virtualisation.vmVariant = {
+              virtualisation = {
+                memorySize = 4096;
+                cores = 4;
+                graphics = true;
+                qemu.options = [
+                  "-vga virtio"
+                  "-display vnc=0.0.0.0:0,websocket=5700"
+                ];
+              };
+              environment.sessionVariables = {
+                WLR_RENDERER_ALLOW_SOFTWARE = "1";
+                WLR_NO_HARDWARE_CURSORS = "1";
+              };
+            };
           }
         ];
       };

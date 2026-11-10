@@ -7,8 +7,8 @@
   boot.kernelModules = [ "kvm-amd" ];
 
   fileSystems."/" = {
-    device = lib.mkForce "/dev/disk/by-uuid/20c7c4b0-41e8-4092-9083-0f8a768fdc02";
-    fsType = "ext4";
+    device = lib.mkDefault "/dev/disk/by-uuid/20c7c4b0-41e8-4092-9083-0f8a768fdc02";
+    fsType = lib.mkDefault "ext4";
   };
 
   networking.useDHCP = lib.mkDefault true;
