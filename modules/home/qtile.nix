@@ -4,7 +4,7 @@
   home.packages = with pkgs; [
     picom
     papirus-icon-theme
-    xorg.xrandr
+    xrandr
   ];
 
   # ===========================================================================

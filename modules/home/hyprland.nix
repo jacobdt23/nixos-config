@@ -19,7 +19,7 @@ let
         exec ${pkgs.flameshot}/bin/flameshot config
         ;;
       folder)
-        exec ${pkgs.xfce.thunar}/bin/thunar "$SCREENSHOT_DIR"
+        exec ${pkgs.thunar}/bin/thunar "$SCREENSHOT_DIR"
         ;;
       *)
         exec ${pkgs.flameshot}/bin/flameshot gui
@@ -70,7 +70,7 @@ in
     networkmanagerapplet
     gnome-keyring
     btop
-    xfce.thunar
+    thunar
     nerd-fonts.jetbrains-mono
     hypr-screenshot
     hypr-clipboard

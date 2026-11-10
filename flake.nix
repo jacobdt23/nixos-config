@@ -35,7 +35,6 @@
           home-manager.nixosModules.home-manager
           {
             networking.hostName = "vm";
-            users.users.jacob.initialPassword = "nixos";
             users.users.jacob.password = "nixos";
             virtualisation.vmVariant = {
               virtualisation = {
