@@ -38,9 +38,15 @@
   services.scx.enable = true;
   services.scx.scheduler = "scx_lavd";
 
-  # --- Networking & DNS ---
+  # --- Networking, DNS & SSH ---
   networking.hostName = lib.mkDefault "nixos";
   networking.networkmanager.enable = true;
+  networking.firewall.enable = false;
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = true;
+    settings.PermitRootLogin = "yes";
+  };
 
   # DNS FIX: Use Google and Cloudflare DNS to ensure NVIDIA servers resolve
   networking.nameservers = [ "8.8.8.8" "1.1.1.1" ];
