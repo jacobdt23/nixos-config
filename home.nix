@@ -10,6 +10,9 @@
   home.homeDirectory = "/home/jacob";
   home.stateVersion = "25.11";
 
+  # Hardwire wallpaper asset directly into ~/Pictures/Wallpapers/default.png
+  home.file."Pictures/Wallpapers/default.png".source = ./assets/default.png;
+
   home.packages = with pkgs; [
     fastfetch
     tree

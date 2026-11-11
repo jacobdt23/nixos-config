@@ -1,14 +1,15 @@
-{ ... }:
+{ config, pkgs, lib, ... }:
 
 {
   # ===========================================================================
   # HYPRPAPER
   # ===========================================================================
   home.file.".config/hypr/hyprpaper.conf".text = ''
-    preload = ~/Pictures/Wallpapers/default.png
-    wallpaper = HDMI-A-1,~/Pictures/Wallpapers/default.png
-    wallpaper = DP-1,~/Pictures/Wallpapers/default.png
-    wallpaper = ,~/Pictures/Wallpapers/default.png
+    preload = ${config.home.homeDirectory}/Pictures/Wallpapers/default.png
+    wallpaper = Virtual-1,${config.home.homeDirectory}/Pictures/Wallpapers/default.png
+    wallpaper = HDMI-A-1,${config.home.homeDirectory}/Pictures/Wallpapers/default.png
+    wallpaper = DP-1,${config.home.homeDirectory}/Pictures/Wallpapers/default.png
+    wallpaper = ,${config.home.homeDirectory}/Pictures/Wallpapers/default.png
     splash = false
   '';
 
@@ -33,7 +34,7 @@
 
     background {
         monitor =
-        path = ~/Pictures/Wallpapers/default.png
+        path = ${config.home.homeDirectory}/Pictures/Wallpapers/default.png
         color = rgba(26, 27, 38, 1.0)
         blur_passes = 3
         blur_size = 6
