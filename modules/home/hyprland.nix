@@ -89,7 +89,7 @@ in
       monitor = [
         "HDMI-A-1, 1920x1080@60, 0x0, 1"
         "DP-1, 1920x1080@60, 1920x0, 1"
-        ", preferred, auto, 1"
+        ", 1920x1080@60, auto, 1"
       ];
 
       workspace = [
