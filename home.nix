@@ -228,8 +228,6 @@
       stats = "sudo scx_lavd --monitor 1";
       topstats = "sudo scx_top";
       copy-config = "bat $(_get_nix_config_dir)/*.nix $(_get_nix_config_dir)/modules/home/*.nix | wl-copy";
-      doom = "/home/jacob/.config/emacs/bin/doom";
-      doom-sync = "~/.config/emacs/bin/doom sync";
       flatclean = "flatpak uninstall --unused";
     };
 

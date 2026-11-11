@@ -5,7 +5,6 @@
     (if lib.elem "nvidia" config.services.xserver.videoDrivers
      then nvtopPackages.full
      else nvtopPackages.amd)
-    emacs
     github-cli
     hugo
     virt-viewer
