@@ -173,20 +173,18 @@
     enable = true;
     shellAliases = {
       # --- Navigation & Quick Editing ---
-      cgh = "cd ~/GitHub";
-      gh = "cd ~/GitHub";
-      hcfg = "cd ~/GitHub/nixos-config && nano home.nix";
-      ncfg = "cd ~/GitHub/nixos-config && nano configuration.nix";
-      edit = "cd ~/GitHub/nixos-config && nano configuration.nix";
-      editconf = "neovide ~/GitHub/nixos-config/configuration.nix > /dev/null 2>&1 & disown";
-      edithome = "neovide ~/GitHub/nixos-config/home.nix > /dev/null 2>&1 & disown";
-      editapps = "neovide ~/GitHub/nixos-config/system-apps.nix > /dev/null 2>&1 & disown";
-      edithypr = "neovide ~/GitHub/nixos-config/modules/home/hyprland.nix > /dev/null 2>&1 & disown";
-      editqtile = "neovide ~/GitHub/nixos-config/modules/home/qtile.nix > /dev/null 2>&1 & disown";
+      cgh = "cd ~/GitHub 2>/dev/null || cd ~";
+      gh = "cd ~/GitHub 2>/dev/null || cd ~";
+      hcfg = "cd $(_get_nix_config_dir) && nano home.nix";
+      ncfg = "cd $(_get_nix_config_dir) && nano configuration.nix";
+      edit = "cd $(_get_nix_config_dir) && nano configuration.nix";
+      editconf = "neovide $(_get_nix_config_dir)/configuration.nix > /dev/null 2>&1 & disown";
+      edithome = "neovide $(_get_nix_config_dir)/home.nix > /dev/null 2>&1 & disown";
+      editapps = "neovide $(_get_nix_config_dir)/system-apps.nix > /dev/null 2>&1 & disown";
+      edithypr = "neovide $(_get_nix_config_dir)/modules/home/hyprland.nix > /dev/null 2>&1 & disown";
+      editqtile = "neovide $(_get_nix_config_dir)/modules/home/qtile.nix > /dev/null 2>&1 & disown";
 
       # --- Rebuilds & Generations ---
-      nrs = "git -C ~/GitHub/nixos-config add . && sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos";
-      hms = "git -C ~/GitHub/nixos-config add . && sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#nixos";
       nix-check = "gh run list -R jacobdt23/nixos-config --workflow nix-check.yml";
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d && nix-store --optimise";
       nclean = "sudo nix-collect-garbage -d";
@@ -201,7 +199,7 @@
       gpush = "git push";
       gpull = "git pull";
       glog = "git log --oneline --graph --decorate";
-      history = "git -C ~/GitHub/nixos-config log --oneline -n 5";
+      history = "git -C $(_get_nix_config_dir) log --oneline -n 5";
 
       # --- Website (Hugo) Workflow Aliases ---
       web-serve = "cd ~/GitHub/website && hugo server -D -b http://localhost:1313/";
@@ -213,35 +211,80 @@
       ll = "ls -lah --color=auto";
       c = "clear";
       nf = "fastfetch";
-      showcase = "fastfetch && echo \"\" && tree ~/GitHub/nixos-config";
-      health = "nvidia-smi && echo '' && zramctl";
+      showcase = "fastfetch && echo \"\" && tree $(_get_nix_config_dir)";
+      health = "nvidia-smi 2>/dev/null || true; echo ''; zramctl";
       stats = "sudo scx_lavd --monitor 1";
       topstats = "sudo scx_top";
-      copy-config = "bat ~/GitHub/nixos-config/*.nix ~/GitHub/nixos-config/modules/home/*.nix | wl-copy";
+      copy-config = "bat $(_get_nix_config_dir)/*.nix $(_get_nix_config_dir)/modules/home/*.nix | wl-copy";
       doom = "/home/jacob/.config/emacs/bin/doom";
       doom-sync = "~/.config/emacs/bin/doom sync";
       flatclean = "flatpak uninstall --unused";
     };
 
     initExtra = ''
-      # THE ULTIMATE SMART REBUILD (v5 - Bulletproof Sync, Updated for ~/GitHub/nixos-config)
-      rebuild() {
-        local HOST=$(hostname)
-        local TARGET="nixos"
-        if [[ "$HOST" == "vm" || "$HOST" == "nixos-vm" ]]; then
-          TARGET="vm"
+      # Auto-detect NixOS config directory
+      _get_nix_config_dir() {
+        if [ -d "$HOME/nixos-config/.git" ]; then
+          echo "$HOME/nixos-config"
+        elif [ -d "$HOME/GitHub/nixos-config/.git" ]; then
+          echo "$HOME/GitHub/nixos-config"
+        elif [ -d "$HOME/.config/nixos/.git" ]; then
+          echo "$HOME/.config/nixos"
+        elif [ -d "$HOME/nixos-config" ]; then
+          echo "$HOME/nixos-config"
+        else
+          echo "$HOME/GitHub/nixos-config"
         fi
+      }
+
+      # Auto-detect flake target (vm vs nixos)
+      _get_nix_target() {
+        local host=$(hostname)
+        if [[ "$host" == "vm" || "$host" == "nixos-vm" ]] || systemd-detect-virt -q 2>/dev/null; then
+          echo "vm"
+        else
+          echo "nixos"
+        fi
+      }
+
+      # Fast Rebuild / Switch Functions (Replaces old hardcoded aliases)
+      nrs() {
+        local cfg=$(_get_nix_config_dir)
+        local target=$(_get_nix_target)
+        echo -e "\033[1;34m--- Rebuilding NixOS ($target via $cfg) ---\033[0m"
+        git -C "$cfg" add . 2>/dev/null || true
+        sudo nixos-rebuild switch --flake "$cfg#$target" "$@"
+      }
+
+      hms() {
+        nrs "$@"
+      }
+
+      # Intercept 'home-manager switch' to run unified rebuild
+      home-manager() {
+        if [[ "$1" == "switch" ]]; then
+          shift
+          nrs "$@"
+        else
+          command home-manager "$@"
+        fi
+      }
+
+      # THE ULTIMATE SMART REBUILD (v6 - Dynamic Location & Target Detection)
+      rebuild() {
+        local CFG_DIR=$(_get_nix_config_dir)
+        local TARGET=$(_get_nix_target)
 
         # 1. Stage changes immediately so pull/rebase works cleanly
-        git -C ~/GitHub/nixos-config add .
+        git -C "$CFG_DIR" add .
 
         # 2. Sync with GitHub
         echo -e "\033[1;33m--- Syncing with GitHub ---\033[0m"
-        git -C ~/GitHub/nixos-config pull --rebase || true
+        git -C "$CFG_DIR" pull --rebase || true
 
         # 3. Auto-detect what files changed
-        local files_changed=$(git -C ~/GitHub/nixos-config diff --cached --name-only | tr '\n' ' ' | sed 's/ $//')
-        local stats=$(git -C ~/GitHub/nixos-config diff --cached --shortstat | sed 's/^ //')
+        local files_changed=$(git -C "$CFG_DIR" diff --cached --name-only | tr '\n' ' ' | sed 's/ $//')
+        local stats=$(git -C "$CFG_DIR" diff --cached --shortstat | sed 's/^ //')
 
         # 4. System generation & timestamp info
         local gen=$(sudo nix-env --list-generations --profile /nix/var/nix/profiles/system | grep current | awk '{print $1}')
@@ -261,13 +304,13 @@
           echo -e "\033[1;32mDetected changes in: $files_changed\033[0m"
         fi
 
-        nixpkgs-fmt ~/GitHub/nixos-config/*.nix ~/GitHub/nixos-config/modules/home/*.nix 2>/dev/null || true
+        nixpkgs-fmt "$CFG_DIR"/*.nix "$CFG_DIR"/modules/home/*.nix 2>/dev/null || true
 
-        if sudo nixos-rebuild switch --flake ~/GitHub/nixos-config#$TARGET; then
-          git -C ~/GitHub/nixos-config add .
-          git -C ~/GitHub/nixos-config commit -m "$msg" || true
+        if sudo nixos-rebuild switch --flake "$CFG_DIR#$TARGET"; then
+          git -C "$CFG_DIR" add .
+          git -C "$CFG_DIR" commit -m "$msg" || true
           echo -e "\033[1;36m☁ Pushing to GitHub...\033[0m"
-          git -C ~/GitHub/nixos-config push
+          git -C "$CFG_DIR" push
           echo -e "\n\033[1;32m🚀 Update complete: $msg\033[0m\n"
         else
           echo -e "\n\033[1;31m❌ Rebuild failed. No push to GitHub.\033[0m\n"
@@ -277,10 +320,11 @@
 
       # THE MAINTENANCE ENGINE (v1 - Deep Clean & Optimize)
       maintenance() {
+        local CFG_DIR=$(_get_nix_config_dir)
         echo -e "\033[1;35m--- Starting Deep System Maintenance ---\033[0m"
 
         echo -e "\033[1;34m1. Updating Flake inputs...\033[0m"
-        nix flake update --flake ~/GitHub/nixos-config
+        nix flake update --flake "$CFG_DIR"
 
         echo -e "\033[1;34m2. Rebuilding system with updated inputs...\033[0m"
         rebuild "chore: weekly maintenance and flake update"
