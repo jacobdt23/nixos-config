@@ -93,9 +93,7 @@ in
         "HDMI-A-1, 1920x1080@60, 0x0, 1"
         "DP-1, 1920x1080@60, 1920x0, 1"
         "Virtual-1, 1920x1080@60, 0x0, 1"
-        "Virtual-1, preferred, auto, 1"
         ", 1920x1080@60, auto, 1"
-        ", preferred, auto, 1"
       ];
 
       workspace = [
@@ -104,6 +102,7 @@ in
 
       # ---- ENVIRONMENT VARIABLES ----
       env = [
+        "AQ_NO_ATOMIC,1"
         "XCURSOR_SIZE,24"
         "HYPRCURSOR_SIZE,24"
         "GDK_BACKEND,wayland,x11,*"
@@ -116,7 +115,7 @@ in
         "QT_QPA_PLATFORM,wayland;xcb"
         "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
         "QT_QPA_PLATFORMTHEME,qt5ct;qt6ct"
-        "WLR_NO_HARDWARE_CURSORS,0"
+        "WLR_NO_HARDWARE_CURSORS,1"
         "HYPRLAND_NO_SD_NOTIFY,1"
       ];
 

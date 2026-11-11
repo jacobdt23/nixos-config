@@ -23,6 +23,11 @@
     "video=Virtual-1:1920x1080@60"
   ];
 
+  environment.sessionVariables = {
+    AQ_NO_ATOMIC = "1";
+    WLR_NO_HARDWARE_CURSORS = "1";
+  };
+
   # --- ZRAM ---
   zramSwap = {
     enable = true;
