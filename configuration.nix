@@ -3,6 +3,7 @@
 {
   imports = [
     ./system-apps.nix
+    ./antigravity.nix
   ];
 
   nixpkgs.config.allowUnfree = true;
