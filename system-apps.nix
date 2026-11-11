@@ -29,5 +29,6 @@
     discord
     kdePackages.kate
     github-desktop
+    wdisplays
   ];
 }
