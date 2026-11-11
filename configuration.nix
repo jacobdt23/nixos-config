@@ -26,10 +26,12 @@
     priority = 100;
   };
 
-  # --- Virtualization (KVM/QEMU) ---
+  # --- Virtualization (KVM/QEMU & Guest Tools) ---
   virtualisation.libvirtd.enable = true;
   programs.virt-manager.enable = true;
   virtualisation.spiceUSBRedirection.enable = true;
+  services.spice-vdagentd.enable = true;
+  services.qemuGuest.enable = true;
 
   # --- Scheduler ---
   services.scx.enable = true;
