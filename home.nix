@@ -172,6 +172,9 @@
   programs.bash = {
     enable = true;
     shellAliases = {
+      # --- Sudo Alias Expansion ---
+      sudo = "sudo ";
+
       # --- Navigation & Quick Editing ---
       cgh = "cd ~/GitHub 2>/dev/null || cd ~";
       gh = "cd ~/GitHub 2>/dev/null || cd ~";
@@ -184,7 +187,16 @@
       edithypr = "neovide $(_get_nix_config_dir)/modules/home/hyprland.nix > /dev/null 2>&1 & disown";
       editqtile = "neovide $(_get_nix_config_dir)/modules/home/qtile.nix > /dev/null 2>&1 & disown";
 
-      # --- Rebuilds & Generations ---
+      # --- NixOS & Home Manager Rebuild Shortcuts ---
+      nrs = "nrs";
+      hms = "hms";
+      nrb = "nrb";
+      nix-switch = "nrs";
+      hm-switch = "hms";
+      home-switch = "hms";
+      rebuild = "rebuild";
+      nix-test = "nix-test";
+      nix-dry = "nix-dry";
       nix-check = "gh run list -R jacobdt23/nixos-config --workflow nix-check.yml";
       cleanup = "sudo nix-collect-garbage --delete-older-than 7d && nix-store --optimise";
       nclean = "sudo nix-collect-garbage -d";
@@ -258,6 +270,43 @@
 
       hms() {
         nrs "$@"
+      }
+
+      nrb() {
+        local cfg=$(_get_nix_config_dir)
+        local target=$(_get_nix_target)
+        echo -e "\033[1;34m--- Building NixOS Boot ($target via $cfg) ---\033[0m"
+        git -C "$cfg" add . 2>/dev/null || true
+        sudo nixos-rebuild boot --flake "$cfg#$target" "$@"
+      }
+
+      nix-test() {
+        local cfg=$(_get_nix_config_dir)
+        local target=$(_get_nix_target)
+        echo -e "\033[1;34m--- Testing NixOS ($target via $cfg) ---\033[0m"
+        git -C "$cfg" add . 2>/dev/null || true
+        sudo nixos-rebuild test --flake "$cfg#$target" "$@"
+      }
+
+      nix-dry() {
+        local cfg=$(_get_nix_config_dir)
+        local target=$(_get_nix_target)
+        echo -e "\033[1;34m--- Dry-building NixOS ($target via $cfg) ---\033[0m"
+        nixos-rebuild dry-build --flake "$cfg#$target" "$@"
+      }
+
+      # Intercept 'nixos-rebuild' to auto-append flake if omitted
+      nixos-rebuild() {
+        if [[ "$1" == "switch" || "$1" == "boot" || "$1" == "test" || "$1" == "dry-build" ]] && [[ ! "$*" == *"--flake"* ]]; then
+          local action="$1"
+          shift
+          local cfg=$(_get_nix_config_dir)
+          local target=$(_get_nix_target)
+          git -C "$cfg" add . 2>/dev/null || true
+          command nixos-rebuild "$action" --flake "$cfg#$target" "$@"
+        else
+          command nixos-rebuild "$@"
+        fi
       }
 
       # Intercept 'home-manager switch' to run unified rebuild
