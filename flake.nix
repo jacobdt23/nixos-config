@@ -31,7 +31,9 @@
         specialArgs = { inherit inputs; };
         modules = [
           ./configuration.nix
-          ./vm-hardware.nix
+          (if builtins.pathExists ./hardware-configuration.nix
+           then ./hardware-configuration.nix
+           else ./vm-hardware.nix)
           home-manager.nixosModules.home-manager
           {
             networking.hostName = "vm";
