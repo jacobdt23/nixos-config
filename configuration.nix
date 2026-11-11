@@ -18,6 +18,10 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [
+    "video=1920x1080@60"
+    "video=Virtual-1:1920x1080@60"
+  ];
 
   # --- ZRAM ---
   zramSwap = {
