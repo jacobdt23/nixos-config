@@ -86,9 +86,13 @@ in
 
     settings = {
       # ---- MONITORS ----
+      # Physical monitors for bare metal (HDMI-A-1 primary, DP-1 secondary)
+      # Virtual-1 explicit 1080p for QEMU/KVM virtual machines
+      # Dynamic fallback for any other attached display
       monitor = [
         "HDMI-A-1, 1920x1080@60, 0x0, 1"
         "DP-1, 1920x1080@60, 1920x0, 1"
+        "Virtual-1, 1920x1080@60, 0x0, 1"
         ", 1920x1080@60, auto, 1"
       ];
 
@@ -130,6 +134,7 @@ in
         "nm-applet"
         "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent"
         "wl-paste --type text --watch cliphist store"
+        "spice-vdagent"
         "swww-daemon || hyprpaper"
         "sleep 0.5 && (swww restore || swww img ~/Pictures/Wallpapers/default.png || true)"
         "waybar"
