@@ -39,7 +39,7 @@
                 "custom/power"
             ],
             "custom/brand": {
-                "format": "󱄅  Start",
+                "format": "󱄅",
                 "tooltip": false,
                 "on-click": "rofi -show drun"
             },
@@ -70,7 +70,7 @@
                 "on-click": "notify-send 'Calendar' \"$(cal)\""
             },
             "custom/media": {
-                "format": "󰎆  Media",
+                "format": "󰎆",
                 "tooltip": false,
                 "on-click": "pavucontrol"
             },
