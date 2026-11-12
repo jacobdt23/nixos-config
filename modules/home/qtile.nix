@@ -197,12 +197,16 @@
     # ---- TOP & BOTTOM BARS -------------------------
     # ------------------------------------------------
     def build_top_bar(screen_index=0):
+        """
+        Unified single top bar combining both top status and bottom dock launchers.
+        """
         widgets = [
+            # Left Margin
             widget.Sep(linewidth=0, padding=4),
 
-            # 1. Brand Chip
+            # 1. Start / Brand Launcher
             widget.TextBox(
-                text="󱄅 NixOS",
+                text="󰣇 Start",
                 foreground=colors["blue"],
                 background=colors["bg_alt"],
                 font="JetBrainsMono Nerd Font Bold",
@@ -234,30 +238,61 @@
             ),
             widget.TextBox(text="|", foreground=colors["fg_dim"], font="JetBrainsMono Nerd Font", padding=2, fontsize=12),
 
-            # 3. Current Layout
+            # 3. Quick App Launchers (from bottom dock)
+            widget.TextBox(
+                text="󰞷 Term",
+                foreground=colors["fg"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=10,
+                padding=6,
+                mouse_callbacks={"Button1": lazy.spawn("kitty")},
+            ),
+            widget.Sep(linewidth=0, padding=2),
+            widget.TextBox(
+                text="󰉋 Files",
+                foreground=colors["fg"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=10,
+                padding=6,
+                mouse_callbacks={"Button1": lazy.spawn("thunar")},
+            ),
+            widget.Sep(linewidth=0, padding=2),
+            widget.TextBox(
+                text="󰈹 Web",
+                foreground=colors["fg"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=10,
+                padding=6,
+                mouse_callbacks={"Button1": lazy.spawn("brave")},
+            ),
+            widget.TextBox(text="|", foreground=colors["fg_dim"], font="JetBrainsMono Nerd Font", padding=2, fontsize=12),
+
+            # 4. Current Layout
             widget.CurrentLayout(
                 foreground=colors["purple"],
                 background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font Bold",
                 fontsize=10,
-                padding=8,
+                padding=6,
             ),
             widget.TextBox(text="|", foreground=colors["fg_dim"], font="JetBrainsMono Nerd Font", padding=2, fontsize=12),
 
-            # 4. Active Window Name
+            # 5. Active Window Name
             widget.WindowName(
                 foreground=colors["fg_dim"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=8,
-                max_chars=35,
-                markup=False,
+                padding=6,
+                max_chars=25,
             ),
 
             # Center Expander Spacer
             widget.Spacer(),
 
-            # 5. Center Date & Clock
+            # 6. Center Date & Clock
             widget.TextBox(
                 text="󰥔 ",
                 foreground=colors["cyan"],
@@ -275,223 +310,142 @@
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("notify-send 'Calendar' \"$(cal)\"")},
             ),
-            widget.Sep(linewidth=0, padding=6),
+            widget.Sep(linewidth=0, padding=4),
 
-            # 6. Media Chip
+            # 7. Media Chip
             widget.TextBox(
                 text="󰎆 Media",
                 foreground=colors["purple"],
                 background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=8,
+                padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("pavucontrol")},
             ),
 
             # Right Expander Spacer
             widget.Spacer(),
 
-            # CPU
-            widget.TextBox(text="󰻠", foreground=colors["blue"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=4),
-            widget.CPU(
-                format="{load_percent}%",
-                foreground=colors["fg"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=10,
-                padding=4,
-                mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-
-            # Memory
-            widget.TextBox(text="󰍛", foreground=colors["purple"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=4),
-            widget.Memory(
-                format="{MemUsed: .0f}{mm}",
-                foreground=colors["fg"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=10,
-                padding=4,
-                mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-
-            # Disk Free
-            widget.TextBox(text="󰋊", foreground=colors["yellow"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=4),
-            widget.DF(
-                format="{uf:.0f}{m} free",
-                foreground=colors["fg"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=10,
-                padding=4,
-                partition="/",
-                visible_on_warn=False,
-                mouse_callbacks={"Button1": lazy.spawn("kitty -e df -h")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-
-            # Audio Volume
-            widget.TextBox(text="", foreground=colors["green"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=4),
-            widget.Volume(
-                foreground=colors["fg"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=10,
-                padding=4,
-                mouse_callbacks={"Button1": lazy.spawn("pavucontrol")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-
-            # Ethernet icon (from Nix store Papirus-Dark)
-            widget.Image(
-                filename="${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark/16x16/devices/network-wired.svg",
-                margin=9,
-                mouse_callbacks={"Button1": lazy.spawn("nm-connection-editor")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-
-            # Power Button
-            widget.TextBox(
-                text=" ⏻ ",
-                foreground=colors["red"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font Bold",
-                fontsize=12,
-                padding=6,
-                mouse_callbacks={"Button1": lazy.shutdown()},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-        ]
-
-        return bar.Bar(
-            widgets,
-            34,
-            background=colors["bar_bg"],
-            opacity=0.94,
-            margin=[6, 12, 0, 12],
-            border_width=[1, 1, 1, 1],
-            border_color=colors["bar_border"],
-        )
-
-    def build_bottom_dock(screen_index=0):
-        widgets = [
-            widget.Sep(linewidth=0, padding=4),
-
-            # Start Button
-            widget.TextBox(
-                text=" 󱄅 Start ",
-                foreground=colors["fg"],
-                background=colors["bg_alt"],
-                font="JetBrainsMono Nerd Font Bold",
-                fontsize=11,
-                padding=8,
-                mouse_callbacks={"Button1": lazy.spawn("rofi -show drun")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-
-            # Search Apps Pill
-            widget.TextBox(
-                text="󰍏  Search apps...",
-                foreground=colors["fg_dim"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=10,
-                padding=10,
-                mouse_callbacks={"Button1": lazy.spawn("rofi -show drun")},
-            ),
-            widget.Spacer(),
-
-            # Center App Quick-Launchers
-            widget.TextBox(
-                text="󰞷 Term",
-                foreground=colors["fg"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=10,
-                padding=8,
-                mouse_callbacks={"Button1": lazy.spawn("kitty")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-            widget.TextBox(
-                text="󰉋 Files",
-                foreground=colors["fg"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=10,
-                padding=8,
-                mouse_callbacks={"Button1": lazy.spawn("thunar")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-            widget.TextBox(
-                text="󰈹 Web",
-                foreground=colors["fg"],
-                background=colors["pill_bg"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=10,
-                padding=8,
-                mouse_callbacks={"Button1": lazy.spawn("brave")},
-            ),
-            widget.Sep(linewidth=0, padding=4),
-
-            # Spacer to Right
-            widget.Spacer(),
-
-            # Dock Utilities: Clipboard, Snip, Keys
+            # 8. Utilities: Clipboard, Snip, Keys (from bottom dock)
             widget.TextBox(
                 text="󰅍 Clip",
                 foreground=colors["fg"],
                 background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=8,
-                mouse_callbacks={"Button1": lazy.spawn("hypr-clipboard")},
+                padding=5,
+                mouse_callbacks={"Button1": lazy.spawn("/home/jacob/.local/bin/hypr-clipboard")},
             ),
-            widget.Sep(linewidth=0, padding=4),
-
+            widget.Sep(linewidth=0, padding=2),
             widget.TextBox(
                 text="󰄀 Snip",
                 foreground=colors["fg"],
                 background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=8,
+                padding=5,
                 mouse_callbacks={
-                    "Button1": lazy.spawn("hypr-screenshot"),
-                    "Button3": lazy.spawn("hypr-screenshot config"),
+                    "Button1": lazy.spawn("/home/jacob/.local/bin/hypr-screenshot"),
+                    "Button3": lazy.spawn("/home/jacob/.local/bin/hypr-screenshot config"),
                 },
             ),
-            widget.Sep(linewidth=0, padding=4),
-
+            widget.Sep(linewidth=0, padding=2),
             widget.TextBox(
                 text="󰌌 Keys",
                 foreground=colors["fg"],
                 background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=8,
-                mouse_callbacks={"Button1": lazy.spawn("notify-send 'Shortcuts' 'Super+Return: Kitty\nSuper+Space: App Launcher\nSuper+E: Thunar\nSuper+B: Brave\nSuper+C: Close Window'")},
+                padding=5,
+                mouse_callbacks={"Button1": lazy.spawn("notify-send 'Shortcuts' 'Super+Return: Terminal\nSuper+Space: App Launcher\nSuper+E: Files\nSuper+B: Browser\nSuper+C: Close Window'")},
             ),
             widget.Sep(linewidth=0, padding=4),
 
-            # Layout Pill
-            widget.CurrentLayout(
-                foreground=colors["purple"],
-                background=colors["bg_alt"],
-                font="JetBrainsMono Nerd Font Bold",
+            # 9. Hardware & System Status Area
+            # CPU
+            widget.TextBox(text="󰻠", foreground=colors["blue"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=3),
+            widget.CPU(
+                format="{load_percent}%",
+                foreground=colors["fg"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=8,
+                padding=3,
+                mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+            ),
+            widget.Sep(linewidth=0, padding=3),
+
+            # Memory
+            widget.TextBox(text="󰍛", foreground=colors["purple"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=3),
+            widget.Memory(
+                format="{MemUsed: .0f}{mm}",
+                foreground=colors["fg"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=10,
+                padding=3,
+                mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+            ),
+            widget.Sep(linewidth=0, padding=3),
+
+            # Disk Free
+            widget.TextBox(text="󰋊", foreground=colors["yellow"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=3),
+            widget.DF(
+                format="{uf:.0f}{m}",
+                foreground=colors["fg"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=10,
+                padding=3,
+                partition="/",
+                visible_on_warn=False,
+                mouse_callbacks={"Button1": lazy.spawn("kitty -e df -h")},
+            ),
+            widget.Sep(linewidth=0, padding=3),
+
+            # Audio Volume
+            widget.TextBox(text="", foreground=colors["green"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=3),
+            widget.Volume(
+                foreground=colors["fg"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=10,
+                padding=3,
+                mouse_callbacks={"Button1": lazy.spawn("pavucontrol")},
+            ),
+            widget.Sep(linewidth=0, padding=3),
+        ]
+
+        # Ethernet icon
+        widgets.extend([
+            widget.Image(
+                filename="${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark/16x16/devices/network-wired.svg",
+                margin=9,
+                mouse_callbacks={"Button1": lazy.spawn("nm-connection-editor")},
+            ),
+            widget.Sep(linewidth=0, padding=3),
+        ])
+
+        # Power Button
+        widgets.extend([
+            widget.TextBox(
+                text=" ⏻ ",
+                foreground=colors["red"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font Bold",
+                fontsize=12,
+                padding=5,
+                mouse_callbacks={"Button1": lazy.shutdown()},
             ),
             widget.Sep(linewidth=0, padding=4),
-        ]
+        ])
 
         return bar.Bar(
             widgets,
-            42,
+            38,
             background=colors["bar_bg"],
             opacity=0.94,
-            margin=[0, 12, 6, 12],
+            margin=[6, 12, 0, 12],
             border_width=[1, 1, 1, 1],
             border_color=colors["bar_border"],
         )
@@ -502,13 +456,11 @@
     screens = [
         Screen(
             top=build_top_bar(0),
-            bottom=build_bottom_dock(0),
             wallpaper=wallpaper_path if os.path.isfile(wallpaper_path) else None,
             wallpaper_mode="fill",
         ),
         Screen(
             top=build_top_bar(1),
-            bottom=build_bottom_dock(1),
             wallpaper=wallpaper_path if os.path.isfile(wallpaper_path) else None,
             wallpaper_mode="fill",
         ),
