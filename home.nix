@@ -181,7 +181,9 @@
     initExtra = ''
       # Auto-detect NixOS config directory
       _get_nix_config_dir() {
-        if [ -d "$HOME/nixos-config/.git" ]; then
+        if [ -d "$HOME/github/nixos-config/.git" ]; then
+          echo "$HOME/github/nixos-config"
+        elif [ -d "$HOME/nixos-config/.git" ]; then
           echo "$HOME/nixos-config"
         elif [ -d "$HOME/GitHub/nixos-config/.git" ]; then
           echo "$HOME/GitHub/nixos-config"
