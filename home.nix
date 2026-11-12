@@ -172,63 +172,10 @@
   programs.bash = {
     enable = true;
     shellAliases = {
-      # --- Sudo Alias Expansion ---
       sudo = "sudo ";
-
-      # --- Navigation & Quick Editing ---
-      cgh = "cd ~/GitHub 2>/dev/null || cd ~";
-      gh = "cd ~/GitHub 2>/dev/null || cd ~";
-      hcfg = "cd $(_get_nix_config_dir) && nano home.nix";
-      ncfg = "cd $(_get_nix_config_dir) && nano configuration.nix";
-      edit = "cd $(_get_nix_config_dir) && nano configuration.nix";
-      editconf = "neovide $(_get_nix_config_dir)/configuration.nix > /dev/null 2>&1 & disown";
-      edithome = "neovide $(_get_nix_config_dir)/home.nix > /dev/null 2>&1 & disown";
-      editapps = "neovide $(_get_nix_config_dir)/system-apps.nix > /dev/null 2>&1 & disown";
-      edithypr = "neovide $(_get_nix_config_dir)/modules/home/hyprland.nix > /dev/null 2>&1 & disown";
-      editqtile = "neovide $(_get_nix_config_dir)/modules/home/qtile.nix > /dev/null 2>&1 & disown";
-
-      # --- NixOS & Home Manager Rebuild Shortcuts ---
-      nrs = "nrs";
-      hms = "hms";
-      nrb = "nrb";
-      nix-switch = "nrs";
-      hm-switch = "hms";
-      home-switch = "hms";
-      rebuild = "rebuild";
-      nix-test = "nix-test";
-      nix-dry = "nix-dry";
-      nix-check = "gh run list -R jacobdt23/nixos-config --workflow nix-check.yml";
-      cleanup = "sudo nix-collect-garbage --delete-older-than 7d && nix-store --optimise";
-      nclean = "sudo nix-collect-garbage -d";
-      listgens = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
-      ngen = "nix-env --list-generations";
-
-      # --- Git Workflow Shortcuts ---
-      gs = "git status";
-      gstatus = "git status";
-      gadd = "git add .";
-      gcm = "git commit -m";
-      gpush = "git push";
-      gpull = "git pull";
-      glog = "git log --oneline --graph --decorate";
-      history = "git -C $(_get_nix_config_dir) log --oneline -n 5";
-
-      # --- Website (Hugo) Workflow Aliases ---
-      web-serve = "cd ~/GitHub/website && hugo server -D -b http://localhost:1313/";
-      web-deploy = "cd ~/GitHub/website && git add . && git commit -m 'Site Update' && git push";
-      web-check = "gh run list --workflow hugo.yaml";
-
-      # --- System, Hardware & Shell Utilities ---
-      l = "ls -alh";
       ll = "ls -lah --color=auto";
-      c = "clear";
-      nf = "fastfetch";
-      showcase = "fastfetch && echo \"\" && tree $(_get_nix_config_dir)";
-      health = "nvidia-smi 2>/dev/null || true; echo ''; zramctl";
-      stats = "sudo scx_lavd --monitor 1";
-      topstats = "sudo scx_top";
-      copy-config = "bat $(_get_nix_config_dir)/*.nix $(_get_nix_config_dir)/modules/home/*.nix | wl-copy";
-      flatclean = "flatpak uninstall --unused";
+      gs = "git status";
+      config = "git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME";
     };
 
     initExtra = ''

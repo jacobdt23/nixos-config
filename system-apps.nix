@@ -6,7 +6,6 @@
      then nvtopPackages.full
      else nvtopPackages.amd)
     github-cli
-    hugo
     virt-viewer
     spice-gtk
     bat
