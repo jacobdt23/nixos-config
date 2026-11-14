@@ -61,7 +61,7 @@
     # ---- TOKYO NIGHT FROSTED PALETTE --------------
     # -----------------------------------------------
     colors = {
-        "bar_bg": "#141622e6",        # rgba(20, 22, 34, 0.90) deep glass
+        "bar_bg": "#141622",          # Solid opaque bar background
         "bg_alt": "#1f2335",          # Slightly lighter pill surface
         "pill_bg": "#1a1b26",         # Standard pill container background
         "pill_border": "#292e42",     # Subtle dark pill border
@@ -544,7 +544,7 @@
             widgets,
             38,
             background=colors["bar_bg"],
-            opacity=0.94,
+            opacity=1.0,
             margin=[6, 12, 0, 12],
             border_width=[1, 1, 1, 1],
             border_color=colors["bar_border"],

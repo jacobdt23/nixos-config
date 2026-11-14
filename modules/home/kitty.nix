@@ -19,8 +19,8 @@
     cursor_shape beam
     cursor_blink_interval 0
 
-    background_opacity 0.95
-    dynamic_background_opacity yes
+    background_opacity 1.0
+    dynamic_background_opacity no
 
     # Dracula Color Palette
     foreground            #f8f8f2
