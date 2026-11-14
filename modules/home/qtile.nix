@@ -502,8 +502,23 @@
             ),
             widget.Sep(linewidth=0, padding=4),
 
-            # System Tray (StatusNotifier for Wayland, Systray for X11 - provides network applet, etc.)
+            # System Tray (StatusNotifier for Wayland, Systray for X11)
             tray_widget(),
+            widget.Sep(linewidth=0, padding=4),
+
+            # Network (Left click: Network Editor GUI, Right click: NMTUI)
+            widget.TextBox(
+                text="󰈀",
+                foreground=colors["cyan"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=11,
+                padding=6,
+                mouse_callbacks={
+                    "Button1": lazy.spawn("nm-connection-editor"),
+                    "Button3": lazy.spawn("kitty -e nmtui"),
+                },
+                **pill_decor(group=False),
+            ),
             widget.Sep(linewidth=0, padding=4),
 
             # Power Button
@@ -748,7 +763,7 @@
       # 3. Keyring, Notifications & Network Applet
       pgrep -x gnome-keyring-d >/dev/null || gnome-keyring-daemon --start --components=secrets &
       pgrep -x dunst >/dev/null || dunst &
-      pgrep -x nm-applet >/dev/null || nm-applet &
+      # nm-applet is superseded by the direct status bar network pill with connection editor launcher
 
       # 4. Wayland Clipboard History
       if [ -n "$WAYLAND_DISPLAY" ]; then
