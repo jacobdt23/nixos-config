@@ -106,7 +106,7 @@
                 "interval": 30,
                 "format": "󰋊 {percentage_used}%",
                 "path": "/",
-                "on-click": "kitty -e df -h"
+                "on-click": "kitty -e btop"
             },
             "wireplumber": {
                 "format": "{icon} {volume}%",

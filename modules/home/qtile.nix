@@ -372,7 +372,15 @@
 
             # 9. Hardware & System Status Area
             # CPU
-            widget.TextBox(text="󰻠", foreground=colors["blue"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=3),
+            widget.TextBox(
+                text="󰻠",
+                foreground=colors["blue"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=11,
+                padding=3,
+                mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+            ),
             widget.CPU(
                 format="{load_percent}%",
                 foreground=colors["fg"],
@@ -385,7 +393,15 @@
             widget.Sep(linewidth=0, padding=3),
 
             # Memory
-            widget.TextBox(text="󰍛", foreground=colors["purple"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=3),
+            widget.TextBox(
+                text="󰍛",
+                foreground=colors["purple"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=11,
+                padding=3,
+                mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+            ),
             widget.Memory(
                 format="{MemUsed: .0f}{mm}",
                 foreground=colors["fg"],
@@ -398,7 +414,15 @@
             widget.Sep(linewidth=0, padding=3),
 
             # Disk Free
-            widget.TextBox(text="󰋊", foreground=colors["yellow"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=3),
+            widget.TextBox(
+                text="󰋊",
+                foreground=colors["yellow"],
+                background=colors["pill_bg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=11,
+                padding=3,
+                mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+            ),
             widget.DF(
                 format="{uf:.0f}{m}",
                 foreground=colors["fg"],
@@ -408,7 +432,7 @@
                 padding=3,
                 partition="/",
                 visible_on_warn=False,
-                mouse_callbacks={"Button1": lazy.spawn("kitty -e df -h")},
+                mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
             ),
             widget.Sep(linewidth=0, padding=3),
 
