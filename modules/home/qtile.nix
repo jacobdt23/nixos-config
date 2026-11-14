@@ -5,6 +5,7 @@
     picom
     papirus-icon-theme
     xrandr
+    python3Packages.qtile-extras
   ];
 
   # ===========================================================================
@@ -22,9 +23,19 @@
     import re
     import subprocess
     import types
-    from libqtile import bar, hook, layout, widget
+    from libqtile import bar, hook, layout
     from libqtile.config import Click, Drag, Group, Key, Match, Screen
     from libqtile.lazy import lazy
+
+    try:
+        from qtile_extras import widget
+        from qtile_extras.widget.decorations import RectDecoration, BorderDecoration
+        HAS_EXTRAS = True
+    except ImportError:
+        from libqtile import widget
+        HAS_EXTRAS = False
+        RectDecoration = None
+        BorderDecoration = None
 
     # ---------------------------------------------
     # ---- WAYLAND & ENVIRONMENT OPTIMIZATIONS ----
@@ -203,8 +214,31 @@
     ]
 
     # ------------------------------------------------
-    # ---- TOP & BOTTOM BARS -------------------------
+    # ---- TOP & BOTTOM BARS (QTILE-EXTRAS UPGRADE) --
     # ------------------------------------------------
+    def pill_decor(group=True, colour=None, line_colour=None, radius=8):
+        if not HAS_EXTRAS or RectDecoration is None:
+            return {}
+        return {
+            "decorations": [
+                RectDecoration(
+                    colour=colour or colors["pill_bg"],
+                    radius=radius,
+                    filled=True,
+                    padding_y=3,
+                    line_width=1,
+                    line_colour=line_colour or colors["pill_border"],
+                    group=group,
+                )
+            ]
+        }
+
+    def tray_widget():
+        if os.environ.get("WAYLAND_DISPLAY"):
+            return widget.StatusNotifier(padding=4, **pill_decor(group=False))
+        else:
+            return widget.Systray(padding=4, **pill_decor(group=False))
+
     def get_disk_status():
         import shutil
         try:
@@ -223,6 +257,7 @@
     def build_top_bar(screen_index=0):
         """
         Unified single top bar combining both top status and bottom dock launchers.
+        Enhanced with qtile-extras rounded floating pill aesthetics.
         """
         widgets = [
             # Left Margin
@@ -232,14 +267,13 @@
             widget.TextBox(
                 text="󰣇",
                 foreground=colors["blue"],
-                background=colors["bg_alt"],
                 font="JetBrainsMono Nerd Font Bold",
                 fontsize=12,
                 padding=8,
                 mouse_callbacks={"Button1": lazy.spawn("rofi -show drun")},
+                **pill_decor(group=False, colour=colors["bg_alt"], line_colour=colors["blue"]),
             ),
             widget.Sep(linewidth=0, padding=4),
-            widget.TextBox(text="|", foreground=colors["fg_dim"], font="JetBrainsMono Nerd Font", padding=2, fontsize=12),
 
             # 2. Workspaces 1-10
             widget.GroupBox(
@@ -259,50 +293,49 @@
                 block_highlight_text_color=colors["bar_bg"],
                 visible_groups=[str(n) for n in range(1, 11)],
                 disable_drag=True,
+                **pill_decor(group=False),
             ),
-            widget.TextBox(text="|", foreground=colors["fg_dim"], font="JetBrainsMono Nerd Font", padding=2, fontsize=12),
+            widget.Sep(linewidth=0, padding=4),
 
-            # 3. Quick App Launchers (from bottom dock)
+            # 3. Quick App Launchers (Terminal, Files, Browser)
             widget.TextBox(
                 text="󰞷",
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("kitty")},
+                **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=2),
             widget.TextBox(
                 text="󰉋",
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("thunar")},
+                **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=2),
             widget.TextBox(
                 text="󰈹",
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("brave")},
+                **pill_decor(group=True),
             ),
-            widget.TextBox(text="|", foreground=colors["fg_dim"], font="JetBrainsMono Nerd Font", padding=2, fontsize=12),
+            widget.Sep(linewidth=0, padding=4),
 
             # 4. Current Layout
             widget.CurrentLayout(
                 foreground=colors["purple"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font Bold",
                 fontsize=10,
                 padding=6,
+                **pill_decor(group=False),
             ),
-            widget.TextBox(text="|", foreground=colors["fg_dim"], font="JetBrainsMono Nerd Font", padding=2, fontsize=12),
+            widget.Sep(linewidth=0, padding=4),
 
             # 5. Active Window Name
             widget.WindowName(
@@ -320,19 +353,19 @@
             widget.TextBox(
                 text="󰥔 ",
                 foreground=colors["cyan"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font Bold",
                 fontsize=12,
                 padding=4,
+                **pill_decor(group=True),
             ),
             widget.Clock(
                 format="%a, %b %d • %I:%M %p",
                 foreground=colors["cyan"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font Bold",
                 fontsize=10,
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("notify-send 'Calendar' \"$(cal)\"")},
+                **pill_decor(group=True),
             ),
             widget.Sep(linewidth=0, padding=4),
 
@@ -340,31 +373,29 @@
             widget.TextBox(
                 text="󰎆",
                 foreground=colors["purple"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("pavucontrol")},
+                **pill_decor(group=False),
             ),
 
             # Right Expander Spacer
             widget.Spacer(),
 
-            # 8. Utilities: Clipboard, Snip, Keys (from bottom dock)
+            # 8. Utilities: Clipboard, Snip, Keys
             widget.TextBox(
                 text="󰅍",
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("/home/jacob/.local/bin/hypr-clipboard")},
+                **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=2),
             widget.TextBox(
                 text="󰄀",
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
                 padding=6,
@@ -372,121 +403,129 @@
                     "Button1": lazy.spawn("/home/jacob/.local/bin/hypr-screenshot"),
                     "Button3": lazy.spawn("/home/jacob/.local/bin/hypr-screenshot config"),
                 },
+                **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=2),
             widget.TextBox(
                 text="󰌌",
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("notify-send 'Shortcuts' 'Super+Return: Terminal\nSuper+Space: App Launcher\nSuper+E: Files\nSuper+B: Browser\nSuper+C: Close Window'")},
+                **pill_decor(group=True),
             ),
             widget.Sep(linewidth=0, padding=4),
 
-            # 9. Hardware & System Status Area
+            # 9. Hardware Status Area
             # CPU
             widget.TextBox(
                 text="󰻠",
                 foreground=colors["blue"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
-                padding=3,
+                padding=4,
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+                **pill_decor(group=True),
             ),
             widget.CPU(
                 format="{load_percent}%",
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=3,
+                padding=4,
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+                **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=3),
+            widget.Sep(linewidth=0, padding=4),
 
             # Memory
             widget.TextBox(
                 text="󰍛",
                 foreground=colors["purple"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
-                padding=3,
+                padding=4,
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+                **pill_decor(group=True),
             ),
             widget.Memory(
                 measure_mem="G",
                 format="{MemUsed:.1f}G ({MemPercent:.0f}%)",
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=3,
+                padding=4,
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+                **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=3),
+            widget.Sep(linewidth=0, padding=4),
 
             # Disk Free
             widget.TextBox(
                 text="󰋊",
                 foreground=colors["yellow"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=11,
-                padding=3,
+                padding=4,
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+                **pill_decor(group=True),
             ),
             widget.GenPollText(
                 func=get_disk_status,
                 update_interval=30,
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=3,
+                padding=4,
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
+                **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=3),
+            widget.Sep(linewidth=0, padding=4),
 
             # Audio Volume
-            widget.TextBox(text="", foreground=colors["green"], background=colors["pill_bg"], font="JetBrainsMono Nerd Font", fontsize=11, padding=3),
+            widget.TextBox(
+                text="",
+                foreground=colors["green"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=11,
+                padding=4,
+                mouse_callbacks={"Button1": lazy.spawn("pavucontrol")},
+                **pill_decor(group=True),
+            ),
             widget.Volume(
                 foreground=colors["fg"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
-                padding=3,
+                padding=4,
                 mouse_callbacks={"Button1": lazy.spawn("pavucontrol")},
+                **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=3),
-        ]
+            widget.Sep(linewidth=0, padding=4),
 
-        # Ethernet icon
-        widgets.extend([
+            # System Tray (StatusNotifier for Wayland, Systray for X11)
+            tray_widget(),
+            widget.Sep(linewidth=0, padding=4),
+
+            # Ethernet icon
             widget.Image(
                 filename="${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark/16x16/devices/network-wired.svg",
                 margin=9,
                 mouse_callbacks={"Button1": lazy.spawn("nm-connection-editor")},
             ),
-            widget.Sep(linewidth=0, padding=3),
-        ])
+            widget.Sep(linewidth=0, padding=4),
 
-        # Power Button
-        widgets.extend([
+            # Power Button
             widget.TextBox(
                 text=" ⏻ ",
                 foreground=colors["red"],
-                background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font Bold",
                 fontsize=12,
-                padding=5,
+                padding=6,
                 mouse_callbacks={"Button1": lazy.shutdown()},
+                **pill_decor(group=False, colour=colors["bg_alt"], line_colour=colors["red"]),
             ),
             widget.Sep(linewidth=0, padding=4),
-        ])
+        ]
 
         return bar.Bar(
             widgets,
