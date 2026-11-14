@@ -12,11 +12,7 @@
   # QTILE CONFIGURATION (~/.config/qtile/config.py)
   # ===========================================================================
   home.file.".config/qtile/config.py".text = ''
-    # =============================================================================
-    # HyprFrost / NixOS Native Qtile Configuration
-    # 100% Cross-Compatible, Self-Contained Native Python Desktop
-    # Matching Exact Jacob Shell Aesthetics (Tokyo Night Glass Floating Bars)
-    # =============================================================================
+    # Qtile window manager configuration
 
     import html
     import os
@@ -37,12 +33,8 @@
         RectDecoration = None
         BorderDecoration = None
 
-    # ---------------------------------------------
-    # ---- WAYLAND & ENVIRONMENT OPTIMIZATIONS ----
-    # ---------------------------------------------
-    os.environ["LIBVA_DRIVER_NAME"] = "nvidia"
+    # Wayland environment variables
     os.environ["__GLX_VENDOR_LIBRARY_NAME"] = "nvidia"
-    os.environ["NVD_BACKEND"] = "direct"
     os.environ["ELECTRON_OZONE_PLATFORM_HINT"] = "auto"
     os.environ["XCURSOR_SIZE"] = "24"
     os.environ["QT_QPA_PLATFORM"] = "wayland;xcb"

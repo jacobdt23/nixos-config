@@ -1,5 +1,5 @@
 {
-  description = "Jacob's Day 32 Golden Build";
+  description = "Jacob's NixOS configuration";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
