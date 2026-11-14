@@ -205,6 +205,21 @@
     # ------------------------------------------------
     # ---- TOP & BOTTOM BARS -------------------------
     # ------------------------------------------------
+    def get_disk_status():
+        import shutil
+        try:
+            total, used, free = shutil.disk_usage("/")
+            pct = (used / total) * 100
+            if free >= 10**12:
+                val = f"{free / (1024**4):.1f}T"
+            elif free >= 10**9:
+                val = f"{free / (1024**3):.0f}G"
+            else:
+                val = f"{free / (1024**2):.0f}M"
+            return f"{val} ({pct:.0f}%)"
+        except Exception:
+            return "? (0%)"
+
     def build_top_bar(screen_index=0):
         """
         Unified single top bar combining both top status and bottom dock launchers.
@@ -403,7 +418,8 @@
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
             ),
             widget.Memory(
-                format="{MemUsed: .0f}{mm}",
+                measure_mem="G",
+                format="{MemUsed:.1f}G ({MemPercent:.0f}%)",
                 foreground=colors["fg"],
                 background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
@@ -423,15 +439,14 @@
                 padding=3,
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
             ),
-            widget.DF(
-                format="{uf:.0f}{m}",
+            widget.GenPollText(
+                func=get_disk_status,
+                update_interval=30,
                 foreground=colors["fg"],
                 background=colors["pill_bg"],
                 font="JetBrainsMono Nerd Font",
                 fontsize=10,
                 padding=3,
-                partition="/",
-                visible_on_warn=False,
                 mouse_callbacks={"Button1": lazy.spawn("kitty -e btop")},
             ),
             widget.Sep(linewidth=0, padding=3),

@@ -98,13 +98,13 @@
             },
             "memory": {
                 "interval": 2,
-                "format": "󰍛 {percentage}%",
+                "format": "󰍛 {used:0.1f}G ({percentage}%)",
                 "tooltip": false,
                 "on-click": "kitty -e btop"
             },
             "disk": {
                 "interval": 30,
-                "format": "󰋊 {percentage_used}%",
+                "format": "󰋊 {free} ({percentage_used}%)",
                 "path": "/",
                 "on-click": "kitty -e btop"
             },
