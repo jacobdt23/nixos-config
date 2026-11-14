@@ -506,12 +506,10 @@
             tray_widget(),
             widget.Sep(linewidth=0, padding=4),
 
-            # Network (Left click: Network Editor GUI, Right click: NMTUI)
-            widget.TextBox(
-                text="󰈀",
-                foreground=colors["cyan"],
-                font="JetBrainsMono Nerd Font",
-                fontsize=11,
+            # Network (Papirus Dark ethernet icon with connection editor launcher)
+            widget.Image(
+                filename="${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark/16x16/devices/network-wired.svg",
+                margin=9,
                 padding=6,
                 mouse_callbacks={
                     "Button1": lazy.spawn("nm-connection-editor"),
