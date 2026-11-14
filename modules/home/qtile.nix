@@ -300,7 +300,7 @@
             ),
             widget.Sep(linewidth=0, padding=4),
 
-            # 3. Quick App Launchers (Terminal, Files, Browser)
+            # 3. Quick App Launchers (Terminal, Files, Browser, Antigravity)
             widget.TextBox(
                 text="󰞷",
                 foreground=colors["fg"],
@@ -326,6 +326,15 @@
                 fontsize=11,
                 padding=6,
                 mouse_callbacks={"Button1": lazy.spawn("brave")},
+                **pill_decor(group=True),
+            ),
+            widget.TextBox(
+                text="󰚩",
+                foreground=colors["fg"],
+                font="JetBrainsMono Nerd Font",
+                fontsize=11,
+                padding=6,
+                mouse_callbacks={"Button1": lazy.spawn("antigravity")},
                 **pill_decor(group=True),
             ),
             widget.Sep(linewidth=0, padding=4),
@@ -503,10 +512,6 @@
                 mouse_callbacks={"Button1": lazy.spawn("pavucontrol")},
                 **pill_decor(group=True),
             ),
-            widget.Sep(linewidth=0, padding=4),
-
-            # System Tray (StatusNotifier for Wayland, Systray for X11)
-            tray_widget(),
             widget.Sep(linewidth=0, padding=4),
 
             # Network (Papirus Dark ethernet icon with connection editor launcher)
