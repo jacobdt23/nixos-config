@@ -40,7 +40,10 @@
     # ---------------------------------------------
     # ---- WAYLAND & ENVIRONMENT OPTIMIZATIONS ----
     # ---------------------------------------------
-    os.environ["WLR_NO_HARDWARE_CURSORS"] = "1"
+    os.environ["LIBVA_DRIVER_NAME"] = "nvidia"
+    os.environ["__GLX_VENDOR_LIBRARY_NAME"] = "nvidia"
+    os.environ["NVD_BACKEND"] = "direct"
+    os.environ["ELECTRON_OZONE_PLATFORM_HINT"] = "auto"
     os.environ["XCURSOR_SIZE"] = "24"
     os.environ["QT_QPA_PLATFORM"] = "wayland;xcb"
     os.environ["GDK_BACKEND"] = "wayland,x11,*"
