@@ -502,16 +502,8 @@
             ),
             widget.Sep(linewidth=0, padding=4),
 
-            # System Tray (StatusNotifier for Wayland, Systray for X11)
+            # System Tray (StatusNotifier for Wayland, Systray for X11 - provides network applet, etc.)
             tray_widget(),
-            widget.Sep(linewidth=0, padding=4),
-
-            # Ethernet icon
-            widget.Image(
-                filename="${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark/16x16/devices/network-wired.svg",
-                margin=9,
-                mouse_callbacks={"Button1": lazy.spawn("nm-connection-editor")},
-            ),
             widget.Sep(linewidth=0, padding=4),
 
             # Power Button
