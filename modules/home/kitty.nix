@@ -2,10 +2,10 @@
 
 {
   # ===========================================================================
-  # KITTY (Tokyo Night Terminal)
+  # KITTY (Dracula Terminal)
   # ===========================================================================
   home.file.".config/kitty/kitty.conf".text = ''
-    # TokyoNight Kitty Configuration
+    # Dracula Kitty Configuration
     font_family      JetBrainsMono Nerd Font
     bold_font        auto
     italic_font      auto
@@ -19,38 +19,58 @@
     cursor_shape beam
     cursor_blink_interval 0
 
-    background_opacity 0.80
+    background_opacity 0.95
     dynamic_background_opacity yes
 
-    # TokyoNight Color Palette
-    foreground #c0caf5
-    background #1a1b26
-    selection_foreground #c0caf5
-    selection_background #33467c
+    # Dracula Color Palette
+    foreground            #f8f8f2
+    background            #282a36
+    selection_foreground  #ffffff
+    selection_background  #44475a
 
-    cursor #c0caf5
-    cursor_text_color #1a1b26
+    cursor                #f8f8f2
+    cursor_text_color     #282a36
 
-    url_color #73daca
+    url_color             #8be9fd
 
-    active_border_color #7aa2f7
-    inactive_border_color #292e42
+    active_border_color   #bd93f9
+    inactive_border_color #6272a4
 
-    color0  #15161e
-    color8  #414868
-    color1  #f7768e
-    color9  #f7768e
-    color2  #9ece6a
-    color10 #9ece6a
-    color3  #e0af68
-    color11 #e0af68
-    color4  #7aa2f7
-    color12 #7aa2f7
-    color5  #bb9af7
-    color13 #bb9af7
-    color6  #7dcfff
-    color14 #7dcfff
-    color7  #a9b1d6
-    color15 #c0caf5
+    active_tab_foreground   #282a36
+    active_tab_background   #f8f8f2
+    inactive_tab_foreground #282a36
+    inactive_tab_background #6272a4
+
+    # Black
+    color0  #21222c
+    color8  #6272a4
+
+    # Red
+    color1  #ff5555
+    color9  #ff6e6e
+
+    # Green
+    color2  #50fa7b
+    color10 #69ff94
+
+    # Yellow
+    color3  #f1fa8c
+    color11 #ffffa5
+
+    # Blue
+    color4  #bd93f9
+    color12 #d6acff
+
+    # Magenta
+    color5  #ff79c6
+    color13 #ff92df
+
+    # Cyan
+    color6  #8be9fd
+    color14 #a4ffff
+
+    # White
+    color7  #f8f8f2
+    color15 #ffffff
   '';
 }

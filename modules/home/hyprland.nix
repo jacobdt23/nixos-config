@@ -132,7 +132,7 @@ in
         "waybar"
         "dunst"
         "gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'"
-        "gsettings set org.gnome.desktop.interface gtk-theme 'Tokyonight-Dark'"
+        "gsettings set org.gnome.desktop.interface gtk-theme 'Dracula'"
       ];
 
       # ---- LOOK AND FEEL ----
