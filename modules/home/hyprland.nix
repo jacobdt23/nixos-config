@@ -90,8 +90,9 @@ in
       # Virtual-1 explicit 1080p for QEMU/KVM virtual machines
       # Dynamic fallback for any other attached display
       monitor = [
-        "HDMI-A-1, 1920x1080@60, 0x0, 1"
-        "DP-1, 1920x1080@60, 1920x0, 1"
+        "HDMI-A-1, 1920x1080@100, 0x0, 1"
+        "DP-2, 1920x1080@100, 1920x0, 1"
+        "DP-1, 1920x1080@100, 1920x0, 1"
         "Virtual-1, preferred, auto, 1"
         ", preferred, auto, 1"
       ];
