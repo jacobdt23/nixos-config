@@ -8,14 +8,20 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  # --- HyprFrost NixOS Identity (/etc/os-release) ---
+  system.nixos = {
+    distroName = "HyprFrost NixOS";
+    distroId = "hyprfrost";
+  };
+
   # --- Bootloader & Kernel ---
   boot.loader.grub = {
-    enable = true;
-    device = "nodev";
-    efiSupport = true;
-    useOSProber = true;
+    enable = lib.mkDefault true;
+    device = lib.mkDefault "nodev";
+    efiSupport = lib.mkDefault true;
+    useOSProber = lib.mkDefault true;
   };
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.efi.canTouchEfiVariables = lib.mkDefault true;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [
@@ -52,9 +58,9 @@
   networking.networkmanager.enable = true;
   networking.firewall.enable = false;
   services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = true;
-    settings.PermitRootLogin = "yes";
+    enable = lib.mkDefault true;
+    settings.PasswordAuthentication = lib.mkDefault true;
+    settings.PermitRootLogin = lib.mkDefault "yes";
   };
 
   # DNS FIX: Use Google and Cloudflare DNS to ensure NVIDIA servers resolve

@@ -9,7 +9,7 @@ on:
 
 jobs:
   evaluate:
-    name: Evaluate #nixos and #vm Configurations
+    name: Evaluate #nixos, #vm, and #iso Configurations
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -29,6 +29,9 @@ jobs:
 
       - name: Evaluate #vm (Virtual Machine + Home Manager + Hyprland + Qtile)
         run: nix eval .#nixosConfigurations.vm.config.system.build.toplevel.drvPath
+
+      - name: Evaluate #iso (Custom HyprFrost NixOS Live ISO + Calamares)
+        run: nix eval .#nixosConfigurations.iso.config.system.build.isoImage.drvPath
 
       - name: Validate Generated Hyprland and Qtile Configs
         run: |
