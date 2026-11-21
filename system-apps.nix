@@ -28,5 +28,7 @@
     kdePackages.kate
     github-desktop
     wdisplays
-  ];
+  ]
+  ++ lib.optionals (pkgs ? libsForQt5 && pkgs.libsForQt5 ? qt5ct) [ pkgs.libsForQt5.qt5ct ]
+  ++ lib.optionals (pkgs ? qt6Packages && pkgs.qt6Packages ? qt6ct) [ pkgs.qt6Packages.qt6ct ];
 }

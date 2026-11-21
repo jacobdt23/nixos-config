@@ -38,6 +38,25 @@ let
       fi
     fi
   '';
+
+  # Omarchy-style minimal system/power menu via Rofi
+  hypr-power-menu = pkgs.writeShellScriptBin "hypr-power-menu" ''
+    choice=$(printf "󰌾  Lock\n󰤄  Suspend\n󰜉  Reboot\n󰐥  Shutdown\n󰍃  Log out" \
+      | ${pkgs.rofi}/bin/rofi -dmenu -i -p "System" -theme-str 'window { width: 320px; height: 270px; }')
+    case "$choice" in
+      *Lock*)     exec ${pkgs.hyprlock}/bin/hyprlock ;;
+      *Suspend*)  exec systemctl suspend ;;
+      *Reboot*)   exec systemctl reboot ;;
+      *Shutdown*) exec systemctl poweroff ;;
+      *Log\ out*) exec hyprctl dispatch exit ;;
+    esac
+  '';
+
+  # Omarchy-style pop-out window (float + pin + reasonable size)
+  hypr-pop-window = pkgs.writeShellScriptBin "hypr-pop-window" ''
+    hyprctl dispatch togglefloating active
+    hyprctl dispatch pin active
+  '';
 in
 {
   imports = [
@@ -46,9 +65,10 @@ in
     ./kitty.nix
     ./dunst.nix
     ./hyprlock.nix
+    ./keybinds-bg.nix
   ];
 
-  # Companion packages for the HyprFrost / Tokyo Night Hyprland desktop
+  # Companion packages for the Omarchy-esque Tokyo Night Hyprland desktop
   home.packages = with pkgs; [
     kitty
     waybar
@@ -74,10 +94,12 @@ in
     nerd-fonts.jetbrains-mono
     hypr-screenshot
     hypr-clipboard
+    hypr-power-menu
+    hypr-pop-window
   ];
 
   # ===========================================================================
-  # HYPRLAND (Native Home Manager Module)
+  # HYPRLAND (Omarchy-esque Tokyo Night Config)
   # ===========================================================================
   wayland.windowManager.hyprland = {
     enable = true;
@@ -86,9 +108,6 @@ in
 
     settings = {
       # ---- MONITORS ----
-      # Physical monitors for bare metal (HDMI-A-1 primary, DP-1 secondary)
-      # Virtual-1 explicit 1080p for QEMU/KVM virtual machines
-      # Dynamic fallback for any other attached display
       monitor = [
         "HDMI-A-1, 1920x1080@100, 0x0, 1"
         "DP-2, 1920x1080@100, 1920x0, 1"
@@ -116,6 +135,7 @@ in
         "QT_QPA_PLATFORM,wayland;xcb"
         "QT_WAYLAND_DISABLE_WINDOWDECORATION,1"
         "QT_QPA_PLATFORMTHEME,qt5ct;qt6ct"
+        "QT_ICON_THEME,Colloid-Dark"
         "WLR_NO_HARDWARE_CURSORS,1"
         "HYPRLAND_NO_SD_NOTIFY,1"
       ];
@@ -132,43 +152,69 @@ in
         "sh -c 'sleep 0.5 && swww img ~/Pictures/Wallpapers/default.png'"
         "waybar"
         "dunst"
+        "toggle-keybinds-bg --start"
         "gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'"
-        "gsettings set org.gnome.desktop.interface gtk-theme 'Dracula'"
+        "gsettings set org.gnome.desktop.interface icon-theme 'Colloid-Dark'"
       ];
 
-      # ---- LOOK AND FEEL ----
+      # ---- LOOK AND FEEL (Omarchy-esque Tokyo Night) ----
       general = {
-        gaps_in = 2;
-        gaps_out = 5;
+        gaps_in = 4;
+        gaps_out = 8;
         border_size = 2;
         "col.active_border" = "rgba(7aa2f7ee) rgba(bb9af7ee) 45deg";
-        "col.inactive_border" = "rgba(3b4261aa)";
+        "col.inactive_border" = "rgba(414868aa)";
+        resize_on_border = true;
+        extend_border_grab_area = 8;
+        hover_icon_on_border = true;
+        allow_tearing = false;
         layout = "dwindle";
       };
 
       decoration = {
-        rounding = 10;
+        rounding = 8;
         active_opacity = 1.0;
         inactive_opacity = 1.0;
 
         shadow = {
           enabled = true;
-          range = 10;
+          range = 14;
           render_power = 3;
-          color = "rgba(00000066)";
+          color = "rgba(00000055)";
         };
 
         blur = {
-          enabled = true;
-          size = 8;
-          passes = 3;
-          vibrancy = 0.1696;
-          xray = true;
+          enabled = false;
         };
       };
 
+      # Omarchy's snappy animation curves & instant workspace switching
       animations = {
         enabled = true;
+        bezier = [
+          "easeOutQuint, 0.23, 1, 0.32, 1"
+          "easeInOutCubic, 0.65, 0.05, 0.36, 1"
+          "linear, 0, 0, 1, 1"
+          "almostLinear, 0.5, 0.5, 0.75, 1.0"
+          "quick, 0.15, 0, 0.1, 1"
+        ];
+        animation = [
+          "global, 1, 8, default"
+          "border, 1, 4.31, easeOutQuint"
+          "windows, 1, 3.03, easeOutQuint"
+          "windowsIn, 1, 3.28, easeOutQuint, popin 87%"
+          "windowsOut, 1, 1.19, linear, popin 87%"
+          "fadeIn, 1, 1.38, almostLinear"
+          "fadeOut, 1, 1.17, almostLinear"
+          "fade, 1, 2.42, quick"
+          "fadeSwitch, 0"
+          "layers, 1, 3.05, easeOutQuint"
+          "layersIn, 1, 3.2, easeOutQuint, fade"
+          "layersOut, 1, 1.2, linear, fade"
+          "fadeLayersIn, 1, 1.43, almostLinear"
+          "fadeLayersOut, 1, 1.11, almostLinear"
+          "workspaces, 0"
+        ];
       };
 
       # ---- INPUT & LAYOUTS ----
@@ -176,14 +222,20 @@ in
         kb_layout = "us";
         follow_mouse = 1;
         sensitivity = 0;
+        repeat_rate = 40;
+        repeat_delay = 250;
+        numlock_by_default = true;
 
         touchpad = {
           natural_scroll = false;
+          clickfinger_behavior = true;
         };
       };
 
       cursor = {
         no_hardware_cursors = true;
+        hide_on_key_press = true;
+        warp_on_change_workspace = 1;
       };
 
       gesture = [
@@ -192,15 +244,23 @@ in
 
       dwindle = {
         preserve_split = true;
+        force_split = 2;
       };
 
       master = {
         new_status = "master";
       };
 
+      binds = {
+        hide_special_on_workspace_change = true;
+      };
+
       misc = {
         force_default_wallpaper = 0;
         disable_hyprland_logo = true;
+        disable_splash_rendering = true;
+        background_color = "rgb(1a1b26)";
+        focus_on_activate = true;
         disable_watchdog_warning = true;
         disable_hyprland_guiutils_check = true;
       };
@@ -214,6 +274,7 @@ in
       windowrule = [
         "suppress_event maximize, match:class .*"
         "no_focus on, match:class ^$, match:title ^$, match:xwayland 1, match:float 1, match:fullscreen 0, match:pin 0"
+        "no_follow_mouse on, match:class ^(resolve)$"
         "float on, match:class ^(hyprland-run)$"
         "move 20 monitor_h-120, match:class ^(hyprland-run)$"
         "float on, size 760 520, center on, match:class .*pavucontrol.*"
@@ -222,31 +283,34 @@ in
       ];
 
       layerrule = [
-        "blur on, match:namespace jacob-(topbar|dock|launcher|clipboard|power|calendar|notifications|toast|media|keybinds|welcome|contextmenu|appcontextmenu|taskbarmenu)"
-        "no_anim on, match:namespace jacob-topbar"
-        "no_anim on, match:namespace jacob-dock"
+        "no_anim on, match:namespace ^(waybar|conky-keybinds-bg)$"
       ];
 
-      # ---- KEYBINDS ----
+      # ---- KEYBINDS (Omarchy-aligned) ----
       "$mainMod" = "SUPER";
 
       bind = [
         # Core App Binds
         "$mainMod, RETURN, exec, kitty"
-        "$mainMod, E, exec, thunar"
         "$mainMod, B, exec, brave"
+        "$mainMod, E, exec, thunar"
         "$mainMod, C, killactive,"
+        "$mainMod, W, killactive,"
         "$mainMod SHIFT, D, exec, discord"
+        "$mainMod SHIFT, ESCAPE, exec, kitty -e btop"
 
-        # App Launcher
+        # App Launcher & System Menus
         ", F24, exec, rofi -show drun"
         "$mainMod, space, exec, rofi -show drun"
         "$mainMod, R, exec, rofi -show drun"
         "$mainMod, D, exec, rofi -show drun"
+        "$mainMod, Q, exec, hypr-power-menu"
+        "$mainMod, K, exec, toggle-keybinds-bg"
 
         # System Management
         "$mainMod SHIFT, R, exec, sh -c 'hyprctl reload && pkill waybar; waybar &'"
-        "$mainMod, L, exec, hyprlock"
+        "$mainMod CONTROL, L, exec, hyprlock"
+        "$mainMod SHIFT, V, exec, hypr-clipboard"
 
         # Screenshot Utility (Flameshot wrapper)
         ", Print, exec, hypr-screenshot"
@@ -257,16 +321,21 @@ in
 
         # Window Management
         "$mainMod, V, togglefloating,"
+        "$mainMod, O, exec, hypr-pop-window"
         "$mainMod, F, fullscreen, 0"
         "$mainMod, P, pseudo,"
         "$mainMod, J, togglesplit,"
         "$mainMod, TAB, focusmonitor, +1"
 
-        # Move focus
+        # Move focus & swap windows
         "$mainMod, left, movefocus, l"
         "$mainMod, right, movefocus, r"
         "$mainMod, up, movefocus, u"
         "$mainMod, down, movefocus, d"
+        "$mainMod SHIFT, left, swapwindow, l"
+        "$mainMod SHIFT, right, swapwindow, r"
+        "$mainMod SHIFT, up, swapwindow, u"
+        "$mainMod SHIFT, down, swapwindow, d"
 
         # Workspaces 1-10
         "$mainMod, 1, workspace, 1"
@@ -292,7 +361,7 @@ in
         "$mainMod SHIFT, 9, movetoworkspace, 9"
         "$mainMod SHIFT, 0, movetoworkspace, 10"
 
-        # Special Workspace
+        # Special Workspace (Scratchpad)
         "$mainMod, S, togglespecialworkspace, magic"
         "$mainMod ALT, S, movetoworkspace, special:magic"
 
@@ -309,7 +378,6 @@ in
         "$mainMod, mouse:272, movewindow"
         "$mainMod, mouse:273, resizewindow"
         ", mouse:274, movewindow"
-        "$mainMod, mouse:274, movewindow"
       ];
 
       binde = [

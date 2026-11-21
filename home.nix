@@ -1,5 +1,154 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
+let
+  claude-lm = pkgs.writeScriptBin "claude-lm" ''
+    #!${pkgs.python3}/bin/python3
+    """Launch Claude Code CLI backed by a local LM Studio server."""
+
+    import json
+    import os
+    import shutil
+    import sys
+    import urllib.error
+    import urllib.request
+
+
+    def fetch_json(url: str, token: str | None):
+        headers = {"Authorization": f"Bearer {token}"} if token else {}
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=3) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+
+
+    def is_embedding(model_type: str, model_id: str) -> bool:
+        return "embed" in model_type.lower() or "embed" in model_id.lower()
+
+
+    def detect_loaded_model(base_url: str, token: str | None):
+        available = []
+        try:
+            data = fetch_json(f"{base_url}/api/v1/models", token)
+            if isinstance(data, dict) and isinstance(data.get("models"), list):
+                for m in data["models"]:
+                    mtype = str(m.get("type", ""))
+                    mkey = str(m.get("key") or m.get("id") or "")
+                    if not mkey or is_embedding(mtype, mkey):
+                        continue
+                    available.append(mkey)
+                    instances = m.get("loaded_instances") or []
+                    if isinstance(instances, list) and instances:
+                        inst = instances[0] if isinstance(instances[0], dict) else {}
+                        model_id = inst.get("id") or mkey
+                        cfg = inst.get("config") if isinstance(inst.get("config"), dict) else {}
+                        ctx = cfg.get("context_length")
+                        ctx_len = int(ctx) if isinstance(ctx, int) and ctx > 0 else None
+                        return str(model_id), ctx_len, available
+                return None, None, available
+        except urllib.error.HTTPError:
+            pass
+
+        try:
+            data = fetch_json(f"{base_url}/api/v0/models", token)
+            if isinstance(data, dict) and isinstance(data.get("data"), list):
+                for m in data["data"]:
+                    mtype = str(m.get("type", ""))
+                    mid = str(m.get("id") or "")
+                    if not mid or is_embedding(mtype, mid):
+                        continue
+                    available.append(mid)
+                    if m.get("state") == "loaded":
+                        ctx = m.get("loaded_context_length")
+                        ctx_len = int(ctx) if isinstance(ctx, int) and ctx > 0 else None
+                        return mid, ctx_len, available
+                return None, None, available
+        except urllib.error.HTTPError:
+            pass
+
+        data = fetch_json(f"{base_url}/v1/models", token)
+        if isinstance(data, dict) and isinstance(data.get("data"), list):
+            for m in data["data"]:
+                mid = str(m.get("id") or "")
+                if mid and not is_embedding("", mid):
+                    available.append(mid)
+            if available:
+                return available[0], None, available
+        return None, None, available
+
+
+    def extract_cli_model(args):
+        for i, arg in enumerate(args):
+            if arg in ("--model", "-m") and i + 1 < len(args):
+                return args[i + 1]
+            if arg.startswith("--model="):
+                return arg.split("=", 1)[1]
+        return None
+
+
+    def main() -> int:
+        args = sys.argv[1:]
+        base_url = os.environ.get("LMSTUDIO_URL", "http://localhost:1234").rstrip("/")
+        if base_url.endswith("/v1"):
+            base_url = base_url[:-3]
+        token = os.environ.get("LM_API_TOKEN") or os.environ.get("ANTHROPIC_AUTH_TOKEN") or "lmstudio"
+
+        claude_bin = shutil.which("claude")
+        if not claude_bin:
+            print("Error: claude binary not found on PATH.", file=sys.stderr)
+            return 1
+
+        if any(a in ("-h", "--help", "-v", "--version") for a in args):
+            os.execv(claude_bin, [claude_bin, *args])
+
+        cli_model = extract_cli_model(args)
+        model = cli_model
+        ctx_len = None
+
+        if not model:
+            try:
+                model, ctx_len, available = detect_loaded_model(base_url, token)
+            except (urllib.error.URLError, TimeoutError, ConnectionError) as exc:
+                print(f"Could not connect to LM Studio at {base_url} ({exc}).", file=sys.stderr)
+                print("Start LM Studio, load a model, and toggle Local Server ON (Developer tab).", file=sys.stderr)
+                return 1
+            if not model:
+                print(f"LM Studio is running at {base_url}, but no LLM is loaded.", file=sys.stderr)
+                for m in available[:10]:
+                    print(f"  - {m}", file=sys.stderr)
+                return 1
+
+        env = os.environ.copy()
+        env.pop("ANTHROPIC_API_KEY", None)
+        override_env = {
+            "ANTHROPIC_BASE_URL": base_url,
+            "ANTHROPIC_AUTH_TOKEN": token,
+            "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
+            "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+            "ANTHROPIC_MODEL": model,
+            "ANTHROPIC_DEFAULT_SONNET_MODEL": model,
+            "ANTHROPIC_DEFAULT_HAIKU_MODEL": model,
+            "ANTHROPIC_DEFAULT_OPUS_MODEL": model,
+        }
+        if ctx_len and ctx_len >= 100000 and "CLAUDE_CODE_AUTO_COMPACT_WINDOW" not in env:
+            override_env["CLAUDE_CODE_AUTO_COMPACT_WINDOW"] = str(ctx_len)
+
+        env.update(override_env)
+        print(f"Launching Claude Code with LM Studio ({base_url}) -> {model}", file=sys.stderr)
+
+        cmd = [claude_bin]
+        if "--settings" not in args:
+            cmd.extend(["--settings", json.dumps({"env": override_env})])
+        if not cli_model:
+            cmd.extend(["--model", model])
+        cmd.extend(args)
+
+        os.execve(claude_bin, cmd, env)
+        return 0
+
+
+    if __name__ == "__main__":
+        raise SystemExit(main())
+  '';
+in
 {
   imports = [
     ./modules/home/hyprland.nix
@@ -18,7 +167,63 @@
     tree
     wl-clipboard
     bat
-  ];
+    claude-lm
+  ]
+  ++ lib.optionals (pkgs ? colloid-icon-theme) [ pkgs.colloid-icon-theme ]
+  ++ lib.optionals (pkgs ? claude-code) [ pkgs.claude-code ]
+  ++ lib.optionals (pkgs ? lmstudio) [ pkgs.lmstudio ];
+
+  # --- SYSTEM-WIDE GTK & QT ICONS (Colloid-Dark) ---
+  gtk = {
+    enable = true;
+    iconTheme = lib.mkIf (pkgs ? colloid-icon-theme) {
+      name = "Colloid-Dark";
+      package = pkgs.colloid-icon-theme;
+    };
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = 1;
+    };
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = 1;
+    };
+  };
+
+  home.file.".config/qt5ct/qt5ct.conf".text = ''
+    [Appearance]
+    icon_theme=Colloid-Dark
+    standard_dialogs=gtk3
+    style=Fusion
+
+    [Fonts]
+    fixed="JetBrainsMono Nerd Font,10,-1,5,50,0,0,0,0,0"
+    general="JetBrainsMono Nerd Font,10,-1,5,50,0,0,0,0,0"
+  '';
+
+  home.file.".config/qt6ct/qt6ct.conf".text = ''
+    [Appearance]
+    icon_theme=Colloid-Dark
+    standard_dialogs=gtk3
+    style=Fusion
+
+    [Fonts]
+    fixed="JetBrainsMono Nerd Font,10,-1,5,50,0,0,0,0,0"
+    general="JetBrainsMono Nerd Font,10,-1,5,50,0,0,0,0,0"
+  '';
+
+  # --- CLAUDE CODE (LM STUDIO) & CLAUDE DESKTOP KEYRING FIX ---
+  home.file.".claude/settings.json".text = builtins.toJSON {
+    theme = "auto";
+    env = {
+      ANTHROPIC_BASE_URL = "http://localhost:1234";
+      ANTHROPIC_AUTH_TOKEN = "lmstudio";
+      CLAUDE_CODE_ATTRIBUTION_HEADER = "0";
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
+    };
+  };
+
+  home.file.".config/claude-desktop-flags.conf".text = ''
+    --password-store=gnome-libsecret
+  '';
 
   # Proper Home Manager integration for direnv + nix-direnv
   programs.direnv = {
@@ -34,6 +239,36 @@
     settings.user = {
       name = "jacobdt23";
       email = "turnejac01@gmail.com";
+    };
+  };
+
+  # --- FISH SHELL (Synced with Arch setup) ---
+  programs.fish = {
+    enable = true;
+    shellAliases = {
+      gs = "git status";
+      ll = "ls -lah";
+      config = "git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME";
+    };
+    interactiveShellInit = ''
+      set -g fish_greeting ""
+      set -g fish_prompt_pwd_dir_length 0
+      set -gx EDITOR nvim
+      set -gx VISUAL nvim
+      if type -q fastfetch
+        fastfetch
+      end
+    '';
+    functions = {
+      nrs = ''
+        set -l cfg "$HOME/GitHub/nixos-config"
+        if test -d "$HOME/nixos-config/.git"; set cfg "$HOME/nixos-config"; end
+        set -l target nixos
+        if systemd-detect-virt -q 2>/dev/null; set target vm; end
+        git -C "$cfg" add . 2>/dev/null; or true
+        sudo nixos-rebuild switch --flake "$cfg#$target" $argv
+      '';
+      hms = "nrs $argv";
     };
   };
 
